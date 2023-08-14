@@ -1,5 +1,5 @@
 [Unit]
-Description=ISUCON9 Portal
+Description=ISUCON13 Portal
 Requires=portal.service
 [Service]
 EnvironmentFile=-/opt/portal/.env

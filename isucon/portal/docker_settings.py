@@ -73,9 +73,6 @@ BENCHMARK_ABORT_TIMEOUT_SEC = 300
 
 SLACK_ENDPOINT_URL = os.environ.get('SLACK_ENDPOINT_URL', "https://slack.com/api/chat.postMessage")
 
-ALIBABA_ACCESS_KEY_ID = os.environ.get('ALIBABA_ACCESS_KEY_ID', '')
-ALIBABA_ACCESS_KEY_SECRET = os.environ.get('ALIBABA_ACCESS_KEY_SECRET', '')
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
