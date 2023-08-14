@@ -1,0 +1,48 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "*"
+flake8 = "*"
+pre-commit = "*"
+isort = "*"
+
+[packages]
+pyyaml = "*"
+requests = "*"
+django-widget-tweaks = "*"
+django-rest-framework = "*"
+django = "==4.2.*"
+boto3 = "*"
+m3u8 = "*"
+pika = "*"
+django-storages = "*"
+django-filter = "*"
+authlib = "*"
+drf-nested-routers = "*"
+factory-boy = "*"
+pycryptodome = "*"
+python-dateutil = "*"
+jsonschema = "*"
+django-prometheus = "*"
+prometheus-client = "*"
+django-cors-headers = "*"
+pillow = "*"
+django-debug-toolbar = "*"
+django-allow-cidr = "*"
+celery = "*"
+celery-redbeat = "*"
+redis = "*"
+django-import-export = "*"
+chardet = "*"
+tablib = "*"
+base45 = "*"
+protobuf = "*"
+social-auth-app-django = "*"
+django-ipware = "*"
+django-stdimage = "*"
+
+[requires]
+python_version = "3.11"

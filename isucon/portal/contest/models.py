@@ -11,7 +11,7 @@ from isucon.portal.models import LogicalDeleteMixin, CommaSeparatedDateField
 from isucon.portal.contest import exceptions
 
 # FIXME: ベンチマーク対象のサーバを変更する機能
-# https://github.com/isucon/isucon8-final/blob/d1480128c917f3fe4d87cb84c83fa2a34ca58d39/portal/lib/ISUCON9/Portal/Web/Controller/API.pm#L32
+# https://github.com/isucon/isucon8-final/blob/d1480128c917f3fe4d87cb84c83fa2a34ca58d39/portal/lib/ISUCON13/Portal/Web/Controller/API.pm#L32
 
 class InformatioManager(models.Manager):
 

@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'isucon.portal.contest',
     'isucon.portal.contest.staff',
     'isucon.portal.contest.result',
-    'isucon.portal.contest.alibaba',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -142,15 +141,12 @@ NUMBER_GROUPING = 3
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/opt/app/static/'
 
 LOGIN_URL = "login"
 
 # アイコンの最大アップロードファイルサイズ(5MB)
 MAX_UPLOAD_SIZE = 5242880
-
-# アプリケーション固有設定
-MEDIA_ROOT = 'media/'
-MEDIA_URL = '/media/'
 
 LOGGING = {
     'version': 1,
@@ -228,11 +224,6 @@ RANKING_TOPN = 30
 
 # Slack
 SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/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"
-
-
-# Alibaba Cloud
-ALIBABA_ACCESS_KEY_ID = "LTAICojzw6sk7nJV"
-ALIBABA_ACCESS_KEY_SECRET = "UuBcfezGolj9GGoimz9wopcalu9dEG"
 
 # 外部リンク
 MANUAL_URL = '' # TODO:
