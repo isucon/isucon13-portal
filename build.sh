@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 
-IMAGE="isucon13-portal"
+IMAGE="424484851194.dkr.ecr.ap-northeast-1.amazonaws.com/isucon13-portal"
 TAG="$1"
 
 if [ -z "$TAG" ];then
@@ -9,5 +9,5 @@ if [ -z "$TAG" ];then
 fi
 
 docker build --platform linux/amd64 -t ${IMAGE}:${TAG} .
-# docker push ${IMAGE}:${TAG}
+docker push ${IMAGE}:${TAG}
 
