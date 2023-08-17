@@ -184,6 +184,12 @@ LOGGING = {
     },
 }
 
+# AWS
+DEFAULT_FILE_STORAGE = "isucon.storage_backends.MediaStorage"
+AWS_ACCESS_KEY_ID = "AKIAWFVKEZX5PTZOKL36"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "isucon13-portal-dev"
+
 
 # 登録期間
 REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 1, 10, 0, 0)

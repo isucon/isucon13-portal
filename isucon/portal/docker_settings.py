@@ -18,9 +18,6 @@ ALLOWED_HOSTS = [os.environ.get('DJANGO_ALLOWED_HOST', "*"), "localhost"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-MEDIA_ROOT = 'media/'
-MEDIA_URL = '/media/'
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
