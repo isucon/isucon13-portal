@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^lz^(m-uy*2htu^fvolbhj!(pmu$x4*c@30s2i)70e=zt_vyai'
+SECRET_KEY = '+2j!(q)l=h9u6x+&i2vv3==lc2@5&3njd=ak1y84j#49^=05+g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ.get('DJANGO_DEBUG', "true").lower() == "true" else False
@@ -65,6 +65,16 @@ SOCIAL_AUTH_GITHUB_SECRET = os.environ.get("GITHUB_SECRET", "")
 
 STATIC_URL = '/static/'
 STATIC_ROOT = "/opt/app/static/"
+
+
+# 動作設定
+
+# 登録期間
+REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 30, 10, 0, 0)
+REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 3, 9, 0, 0)
+
+
+
 
 # アプリケーション固有設定
 

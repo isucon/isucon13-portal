@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^lz^(m-uy*2htu^fvolbhj!(pmu$x4*c@30s2i)70e=zt_vyai'
+SECRET_KEY = '#_6zme*8g-#1dayt=a$6*&^g3_%gve*ymzw*fdm#96512ldv!z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,11 +34,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'isucon.portal',
-    'isucon.portal.authentication',
-    'isucon.portal.contest',
-    'isucon.portal.contest.staff',
-    'isucon.portal.contest.result',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +44,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
     'widget_tweaks',
+    'isucon.portal',
+    'isucon.portal.authentication',
+    # 'isucon.portal.contest',
+    # 'isucon.portal.contest.staff',
+    # 'isucon.portal.contest.result',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +99,8 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
     }
 }
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "authentication.User"
 
@@ -184,14 +186,13 @@ LOGGING = {
 
 
 # 登録期間
-REGISTRATION_START_AT = portal_utils.get_jst_datetime(2019, 7, 1, 9, 0, 0)
-REGISTRATION_END_AT = portal_utils.get_jst_datetime(2019, 8, 25, 9, 0, 0)
+REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 1, 10, 0, 0)
+REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 3, 9, 0, 0)
 
 # コンテスト開催期間
 # 日付
 CONTEST_DATES = [
-    datetime.date(2019, 9, 25),
-    datetime.date(2019, 10, 5)
+    datetime.date(2023, 11, 25),
 ]
 
 # 時刻
@@ -199,19 +200,19 @@ CONTEST_START_TIME = portal_utils.get_jst_time(10, 0, 0)
 CONTEST_END_TIME = portal_utils.get_jst_time(18, 0, 0)
 
 # Result
-SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2019, 10, 5, 22, 0, 0)
+SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 30, 22, 0, 0)
 
 # Github認証に使うトークン
 # TODO: 入れ替える
-SOCIAL_AUTH_GITHUB_KEY = '8ad74d7452d59b6d5572'
-SOCIAL_AUTH_GITHUB_SECRET = '3682fb62f9623c93cfc5fa1c2c79cbe9e539e016'
+SOCIAL_AUTH_GITHUB_KEY = '6297ed790692a808fda1'
+SOCIAL_AUTH_GITHUB_SECRET = '2a50f16453b05aaa2b024d882ca5030de9858abc'
 
 BENCHMARK_ABORT_TIMEOUT_SEC = 300
 
 # チームに所属できる最大人数
 MAX_TEAM_MEMBER_NUM = 3
 # 最大チーム数
-MAX_TEAM_NUM = 600
+MAX_TEAM_NUM = 220
 
 # チームパスワードとして使う文字群
 PASSWORD_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'

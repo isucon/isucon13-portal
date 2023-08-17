@@ -36,11 +36,7 @@ class Team(LogicalDeleteMixin, models.Model):
     name = models.CharField("名前", max_length=100, unique=True)
     password = models.CharField("パスワード", max_length=100, unique=True)
 
-    benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
-
-    participate_at = models.DateField("参加日", blank=True)
-
-    alibaba_account = models.CharField("Alibaba Cloud Account ID", max_length=20, blank=True)
+    # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
 
     def is_playing(self):
         """参加中か(日付が一致し、時刻が範囲内なら)"""

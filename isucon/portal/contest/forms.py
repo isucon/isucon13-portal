@@ -31,12 +31,6 @@ class TeamForm(forms.ModelForm):
         model = Team
         fields = ("name", "participate_at", )
 
-    participate_at = forms.DateField(
-        label="参加日選択",
-        input_formats=["%Y-%m-%d"],
-        widget=forms.Select(choices=Team.PARTICIPATE_AT_CHOICES),
-        required=True,
-    )
 
     def __init__(self, *args, **kwargs):
         self.is_registration_available = is_registration_available()

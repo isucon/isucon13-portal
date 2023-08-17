@@ -45,12 +45,6 @@ class TeamRegisterForm(forms.Form):
         label="注意を読みましたチェック",
         required=True,
     )
-    participate_at = forms.DateField(
-        label="参加日選択",
-        input_formats=["%Y-%m-%d"],
-        widget=forms.Select(choices=Team.PARTICIPATE_AT_CHOICES),
-        required=True,
-    )
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
@@ -74,7 +68,7 @@ class TeamRegisterForm(forms.Form):
         # パスワードとして使う文字群から指定文字数ランダムに選択してチームパスワードとする
         password = ''.join(random.choice(settings.PASSWORD_LETTERS) for i in range(settings.PASSWORD_LENGTH))
 
-        team = Team.objects.create(name=self.cleaned_data['name'], participate_at=self.cleaned_data['participate_at'], password=password, owner=user)
+        team = Team.objects.create(name=self.cleaned_data['name'], password=password, owner=user)
 
         user.team = team
         user.is_student = self.cleaned_data['is_student']

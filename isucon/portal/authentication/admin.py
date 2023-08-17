@@ -30,7 +30,7 @@ admin.site.register(User, UserAdmin)
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "owner", "participate_at", "is_active", "benchmarker"]
+    list_display = ["id", "name", "owner", "is_active"]
     list_filter = ["is_active"]
     search_fields = ["name"]
 
