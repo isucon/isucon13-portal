@@ -87,7 +87,7 @@ def job_detail(request, pk):
 @team_is_now_on_contest
 def job_enqueue(request):
 
-    if not request.is_ajax():
+    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
         return HttpResponse("このエンドポイントはAjax専用です", status=400)
 
     context = get_base_context(request.user)
@@ -170,13 +170,13 @@ def delete_server(request, pk):
 
     if server.is_bench_target:
         messages.warning(request, "ベンチマーク対象のサーバは削除できません")
-        if request.is_ajax():
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return HttpResponse("Error")
         return redirect("servers")
 
     server.delete()
 
-    if request.is_ajax():
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse(
             {}, status = 200
         )
@@ -208,54 +208,9 @@ def teams(request):
 
 
 @team_is_authenticated
-def team_settings(request):
-    form = TeamForm(instance=request.user.team)
-    user_form = UserForm(instance=request.user)
-    if request.method == "POST" and request.POST.get("action") == "team":
-        form = TeamForm(request.POST, instance=request.user.team)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "チーム情報を更新しました")
-            return redirect("team_settings")
-
-    if request.method == "POST" and request.POST.get("action") == "user":
-        user_form = UserForm(request.POST, instance=request.user)
-        if user_form.is_valid():
-            user_form.save()
-            messages.success(request, "ユーザー情報を更新しました")
-            return redirect("team_settings")
-
-    context = {
-        "form": form,
-        "user_form": user_form,
-        "team_members": request.user.team.user_set.all()
-    }
-    return render(request, "team_settings.html", context)
-
-@team_is_authenticated
-def update_user_icon(request):
-    form = UserIconForm(user=request.user)
-    if request.method == "POST":
-        form = UserIconForm(request.POST, request.FILES, user=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "ユーザーのアイコンを更新しました")
-        else:
-            messages.warning(request, "ユーザーのアイコンを更新に失敗しました")
-    else:
-        return HttpResponseNotAllowed(["POST"])
-
-    if request.is_ajax():
-        return JsonResponse(
-            {}, status = 200
-        )
-    return redirect("team_settings")
-
-
-@team_is_authenticated
 @team_is_now_on_contest
 def graph(request):
-    if not request.is_ajax():
+    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
         return HttpResponse("このエンドポイントはAjax専用です", status=400)
 
     context = get_base_context(request.user)

@@ -22,6 +22,7 @@ from isucon.portal import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('dashboard/', views.index, name='dashboard'),  # 暫定
     path('auth/', include("isucon.portal.authentication.urls")),
     # path('contest/', include("isucon.portal.contest.urls")),
     # path('internal/', include("isucon.portal.internal.urls")),

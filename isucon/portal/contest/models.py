@@ -16,7 +16,7 @@ from isucon.portal.contest import exceptions
 class InformatioManager(models.Manager):
 
     def of_team(self, team):
-        return self.get_queryset().filter(is_enabled=True, allowed_participate_at__icontains=str(team.participate_at))
+        return self.get_queryset().filter(is_enabled=True)
 
 
 
@@ -28,7 +28,6 @@ class Information(LogicalDeleteMixin, models.Model):
     description = models.TextField('本文')
 
     is_enabled = models.BooleanField("表示", blank=True)
-    allowed_participate_at = CommaSeparatedDateField("対象日", max_length=512, choices=[])
 
     objects = InformatioManager()
 

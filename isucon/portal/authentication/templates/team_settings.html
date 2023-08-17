@@ -74,29 +74,6 @@
             </div>
           </div>
 
-          <div class="field is-horizontal">
-            <div class="field-label is-normal">
-              <label class="label">参加日</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                {% if form.is_registration_available %}
-                <p class="control">
-                  <div class="select">
-                    {{ form.participate_at }}
-                  </div>
-                </p>
-                {% else %}
-                <p class="control">
-                  <!-- 何を入力しても無視される -->
-                  {{ form.participate_at.as_hidden }}
-                  <input class="input is-static" value="{{ user.team.participate_at|date:"Y-m-d (D)" }}" readonly>
-                </p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-
           {% if user.team.owner.id == user.id %}
           <div class="field is-horizontal">
             <div class="field-label is-normal">

@@ -13,8 +13,6 @@ urlpatterns = [
     path('servers/<int:pk>/', views.delete_server, name="delete_server"),
     path('graph/', views.graph, name="graph"),
     path('teams/', views.teams, name="teams"),
-    path('settings/team/', views.team_settings, name="team_settings"),
-    path('settings/icon/', views.update_user_icon, name="update_user_icon"),
     path('staff/', include("isucon.portal.contest.staff.urls")),
     path('result/', include("isucon.portal.contest.result.urls")),
 ]

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core import files
 
 from isucon.portal.authentication.models import Team, User
+from isucon.portal.authentication.decorators import is_registration_available
 from isucon.portal import settings
 
 class TeamRegisterForm(forms.Form):
@@ -180,3 +181,42 @@ def check_uploaded_filesize(content):
     if content.size > settings.MAX_UPLOAD_SIZE:
         raise forms.ValidationError(('ファイルサイズが大きすぎます。'))
     return content
+
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ("name", )
+
+
+    def __init__(self, *args, **kwargs):
+        self.is_registration_available = is_registration_available()
+
+        super().__init__(*args, **kwargs)
+
+        if not self.is_registration_available:
+            self.fields['name'].widget.attrs['readonly'] = True
+            self.fields['name'].widget.attrs['class'] = 'is-static'
+
+    def clean_name(self):
+        if not self.is_registration_available:
+            return self.instance.name
+        return self.cleaned_data.get("name", "")
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["display_name", ]
+
+class UserIconForm(forms.Form):
+    icon = forms.ImageField(label="アイコン", required=True)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        self.user.icon = self.cleaned_data['icon']
+        self.user.save()
+        return self.user

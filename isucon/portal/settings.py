@@ -191,9 +191,7 @@ REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 3, 9, 0, 0)
 
 # コンテスト開催期間
 # 日付
-CONTEST_DATES = [
-    datetime.date(2023, 11, 25),
-]
+CONTEST_DATE = datetime.date(2023, 11, 25)
 
 # 時刻
 CONTEST_START_TIME = portal_utils.get_jst_time(10, 0, 0)
