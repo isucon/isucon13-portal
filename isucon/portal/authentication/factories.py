@@ -28,6 +28,4 @@ class TeamFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda idx: "team{}".format(idx))
     password = factory.Sequence(lambda idx: make_password("password{}".format(idx)))
 
-    participate_at = factory.fuzzy.FuzzyChoice(settings.CONTEST_DATES)
-
     is_active = True

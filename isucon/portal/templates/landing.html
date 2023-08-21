@@ -23,7 +23,7 @@
         <div class="container">
           <div class="navbar-brand">
               <a class="navbar-item" href="/">
-                <img src="{% static "img/isucon13_white.svg" %}" width="112" height="28">
+                <img src="{% static "img/isucon13_white.png" %}" width="112" height="28">
               </a>
           </div>
           <div id="navbarMenu" class="navbar-menu">
@@ -107,7 +107,7 @@
               Comming soon!
             </h1>
             <h2 class="subtitle">
-                登録期間: {{ registration_end_at | date:"Y年m月d日 H時i分" }} まで
+                登録期間: {{ registration_start_at | date:"Y年m月d日 H時i分" }} から {{ registration_end_at | date:"Y年m月d日 H時i分" }} まで
             </h2>
             {% endif %}
           </div>

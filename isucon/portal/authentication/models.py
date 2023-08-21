@@ -29,18 +29,16 @@ class Team(LogicalDeleteMixin, models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チーム"
 
-    PARTICIPATE_AT_CHOICES = [(d, "{}日目 ({})".format(idx+1, d.strftime("%Y-%m-%d %a"))) for idx, d in enumerate(settings.CONTEST_DATES)]
-
     owner = models.OneToOneField(User, verbose_name="オーナー", on_delete=models.PROTECT, related_name="+")
     is_active = models.BooleanField("有効", default=True, blank=True)
     name = models.CharField("名前", max_length=100, unique=True)
     password = models.CharField("パスワード", max_length=100, unique=True)
 
-    benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
+    # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
 
-    participate_at = models.DateField("参加日", blank=True)
-
-    alibaba_account = models.CharField("Alibaba Cloud Account ID", max_length=20, blank=True)
+    @property
+    def participate_at(self):
+        return settings.CONTEST_DATE
 
     def is_playing(self):
         """参加中か(日付が一致し、時刻が範囲内なら)"""

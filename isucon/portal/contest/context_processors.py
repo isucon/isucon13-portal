@@ -27,7 +27,7 @@ def settings_url(request):
         team_context = {
             "is_now_on_contest": team.is_playing(),
             "servers": Server.objects.of_team(team),
-            'informations': Information.objects.of_team(team),
+            'informations': [] # FIXME: Information.objects.of_team(team),
         }
 
         if request.user.is_staff:

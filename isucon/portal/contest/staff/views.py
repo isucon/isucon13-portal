@@ -140,7 +140,7 @@ def job_detail(request, pk):
 
 @staff_member_required
 def graph(request):
-    if not request.is_ajax():
+    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
         return HttpResponse("このエンドポイントはAjax専用です", status=400)
 
     # participate_at, graph_teams は dashboardにより必ず何かしらの値が設定される
