@@ -27,7 +27,6 @@ ADD isucon/ /opt/app/isucon/
 # NGINX
 RUN python manage.py collectstatic --noinput
 RUN rm -v /var/www/html/*
-ADD htdocs/ /var/www/html/
 RUN ln -s /opt/app/static /var/www/html/static
 ADD files/nginx.conf /etc/nginx/nginx.conf
 ADD files/default.conf /etc/nginx/sites-enabled/default
