@@ -33,6 +33,7 @@ def settings_url(request):
         if request.user.is_staff:
             team_context["is_now_on_contest"] = True
 
+        team_context["is_now_on_contest"] = False  # FIXME: remove
         context.update(team_context)
 
 

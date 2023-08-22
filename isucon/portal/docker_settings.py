@@ -32,10 +32,10 @@ DATABASES_SQLITE3 = {
 DATABASES_POSTGRES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'isucon',
-        'USER': 'isucon',
-        'PASSWORD': 'password',
-        'HOST': os.environ.get('POSTGRES_HOST', "postgres"),
+        'NAME': os.environ.get('DATABASE_NAME', "isucon"),
+        'USER': os.environ.get('DATABASE_USER', "isucon"),
+        'PASSWORD': os.environ.get('DATABASE_PASS', "password"),
+        'HOST': os.environ.get('DATABASE_HOST', "postgres"),
         'PORT': '5432',
         'ATOMIC_REQUESTS': True,
     }
@@ -64,13 +64,16 @@ STATIC_URL = '/static/'
 STATIC_ROOT = "/opt/app/static/"
 
 
+# AWS
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "isucon13-portal-dev")
+
 # 動作設定
 
 # 登録期間
-REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 30, 10, 0, 0)
+REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 22, 10, 0, 0)
 REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 3, 9, 0, 0)
-
-
 
 
 # アプリケーション固有設定

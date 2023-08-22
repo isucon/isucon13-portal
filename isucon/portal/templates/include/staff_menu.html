@@ -2,6 +2,7 @@
     Staff
 </p>
 <ul class="menu-list">
+    {% comment %}
     <li>
         <a class="{% if page == "dashboard" %}active{% endif %}" href="{% url "staff_dashboard" %}">
             <span class="icon">
@@ -26,4 +27,5 @@
             <span>Show All Team Scores</span>
         </a>
     </li>
+    {% endcomment %}
 </ul>
