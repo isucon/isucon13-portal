@@ -16,7 +16,7 @@ from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 class LoginView(DjangoLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["create_team_limited"] = Team.objects.count() >= settings.MAX_TEAM_NUM
+        context["create_team_limited"] = Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM
         return context
 
 
@@ -24,7 +24,12 @@ class LoginView(DjangoLoginView):
 @login_required
 def create_team(request):
 
-    if Team.objects.count() >= settings.MAX_TEAM_NUM:
+    # 登録済み
+    if request.user.team:
+        return redirect("team_settings")
+
+    # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
+    if Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM:
         return render(request, "create_team_max.html")
 
     user = request.user
@@ -32,7 +37,7 @@ def create_team(request):
         "email": user.email,
     }
     form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, initial=initial)
-    if not form.is_valid():
+    if request.method != "POST" or not form.is_valid():
         # フォームの内容が不正なら戻す
         return render(request, "create_team.html", {'form': form, 'username': request.user, 'email': request.user.email})
 
@@ -48,11 +53,16 @@ def create_team(request):
 @check_registration
 @login_required
 def join_team(request):
+
+    # 登録済み
+    if request.user.team:
+        return redirect("team_settings")
+
     user = request.user
     initial = {}
     form = JoinToTeamForm(request.POST or None, request.FILES or None, user=user, initial=initial)
 
-    if not form.is_valid():
+    if request.method != "POST" or not form.is_valid():
         # フォームの内容が不正なら戻す
         return render(request, "join_team.html", {'form': form, 'username': request.user})
 

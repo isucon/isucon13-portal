@@ -4,12 +4,6 @@
 
 {% block content %}
 
-{% if user and user.is_authenticated and user.team %}
-<script>
-    document.location = "{% url 'dashboard' %}";
-</script>
-{% else %}
-
 <div class="container">
     <figure class="logo has-text-centered">
         <img src="{% static "img/isucon13_logo.png" %}" width="400px">
