@@ -46,7 +46,16 @@
                         </span>
                         <span>Dashboard</span>
                     </a>
+                    {% if regulation_url %}
+                        <a class="navbar-item" href="{{ regulation_url }}">
+                            <span class="icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </span>
+                            <span>Regulation</span>
+                        </a>
+                    {% endif %}
                 </div>
+
                 <div class="navbar-end">
                     <a class="navbar-item" href="{% url 'logout' %}">
                         <span class="icon">
@@ -119,6 +128,16 @@
                             </a>
                         </li>
                         {% endif %}
+                        {% if regulation_url %}
+                        <li>
+                            <a target="_blank" href="{{ regulation_url }}">
+                                <span class="icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </span>
+                                <span>Regulation</span>
+                            </a>
+                        </li>
+                        {% endif %}
                         {% if is_now_on_contest and manual_url %}
                         <li>
                             <a target="_blank" href="{{ manual_url }}">
@@ -126,16 +145,6 @@
                                     <i class="fas fa-book"></i>
                                 </span>
                                 <span>Manual</span>
-                            </a>
-                        </li>
-                        {% endif %}
-                        {% if is_now_on_contest and regulation_url %}
-                        <li>
-                            <a target="_blank" href="{{ regulation_url }}">
-                                <span class="icon">
-                                    <i class="fas fa-clipboard-list"></i>
-                                </span>
-                                <span>Regulation</span>
                             </a>
                         </li>
                         {% endif %}
