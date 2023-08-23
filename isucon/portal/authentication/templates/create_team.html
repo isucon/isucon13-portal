@@ -2,6 +2,89 @@
 {% load static %}
 
 
+{% block script %}
+<script>
+    var iconFile = null;
+
+    $('#id_is_import_github_icon').on('change', function (){
+        if ($('#id_is_import_github_icon').prop('checked'))
+        {
+            $('#id_user_icon').val('');
+            $('#id_user_icon').attr('disabled', '');
+            $('#preview_image').css({backgroundImage: 'url(https://github.com/{{ user.username }}.png)'});
+            iconFile = null;
+        } else {
+            $('#id_user_icon').removeAttr('disabled');
+            $('#preview_image').css({backgroundImage: 'none'});
+            iconFile = null;
+        }
+    });
+
+    var iconCroppie = $("#icon-croppie").croppie({
+        enableExif: true,
+        viewport: {
+            width: 400,
+            height: 400,
+            type: 'square'
+        },
+        boundary: {
+            width: 600,
+            height: 600
+        },
+        showZoomer: true,
+        enableResize: false,
+        enableOrientation: true,
+        mouseWheelZoom: 'ctrl'
+    });
+
+    $(".open-icon").click(function(){
+
+    var input = $('<input type="file" accept="image/*">');
+    input.change(function(){
+        var file = this.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+        $("#icon-modal").addClass("is-active");
+        iconCroppie.croppie('bind', {
+            url: e.target.result
+        }).then(function(){
+            console.log('Croppie bind complete');
+        });
+        }
+        reader.readAsDataURL(file);
+    });
+    input.click();
+    });
+
+    $(".close-icon").click(function(){
+        $("#icon-modal").removeClass("is-active");
+    });
+
+    $("#icon-save").click(function(){
+        iconCroppie.croppie('result', {type: 'blob', size: 'original', format: 'png', quality: 1, circle: false }).then(function(blob){
+            iconFile = new File([blob], 'icon.png', {type: "image/png"});
+            var blobUrl = window.URL.createObjectURL(blob) ;
+            $('#preview_image').css({backgroundImage: 'url("' + blobUrl + '")'});
+        });
+        $("#icon-modal").removeClass("is-active");
+    });
+
+    $("form").submit(function(){
+        if (iconFile) {
+            dt = new DataTransfer();
+            dt.items.add(iconFile);
+            iconInput = $("<input>").attr("type", "file").attr("name", "user_icon").css("width", "1px").css("height", "1px");
+            iconInput[0].files = dt.files;
+            $("form").append(iconInput);
+        }
+    });
+
+
+</script>
+{% endblock %}
+
+
+
 {% block content %}
 
 
@@ -88,9 +171,9 @@
                     <div id="preview_image" style="border: 1px solid; display: block; background-image: none; background-size: cover; width: 150px; height: 150px;"></div>
                     <span>{{ form.is_import_github_icon }} {{ form.is_import_github_icon.label }}</span>
                     <div class="control">
-                        {{ form.user_icon }}
+                        <button type="button" class="button open-icon is-small">ファイル選択</button>
+                        <p class="help">最大1MB</p>
                     </div>
-                    <p class="help">最大1MB</p>
                 </div>
 
                 <div class="field">
@@ -123,29 +206,23 @@
     </div>
 </div>
 
-<script>
-    $('#id_user_icon').on('change', function(event) {
-        var files = event.target.files;
-        var reader = new FileReader();
-        reader.onload = (function () {
-            return function (e) {
-                a = $('#preview_image').css({backgroundImage: 'url("' + e.target.result + '")'});
-            };
-        })(files[0]);
-        reader.readAsDataURL(files[0]);
-    });
 
-    $('#id_is_import_github_icon').on('change', function (){
-        if ($('#id_is_import_github_icon').prop('checked'))
-        {
-            $('#id_user_icon').val('');
-            $('#id_user_icon').attr('disabled', '');
-            $('#preview_image').css({backgroundImage: 'url(https://github.com/{{ user.username }}.png)'});
-        } else {
-            $('#id_user_icon').removeAttr('disabled');
-            $('#preview_image').css({backgroundImage: 'none'});
-        }
-    });
-</script>
+<div class="modal" id="icon-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">アイコン登録</p>
+      <button class="delete close-icon" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div id="icon-croppie"></div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" id="icon-save">決定</button>
+      <button class="button close-icon">キャンセル</button>
+    </footer>
+  </div>
+</div>
+
 
 {% endblock %}
