@@ -34,7 +34,7 @@ class Team(LogicalDeleteMixin, models.Model):
     name = models.CharField("名前", max_length=100, unique=True)
     password = models.CharField("パスワード", max_length=100, unique=True)
 
-    is_guest = models.BooleanField("ゲストチーム", blank=True)
+    is_guest = models.BooleanField("ゲストチーム", blank=True, default=False)
 
     # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
 
