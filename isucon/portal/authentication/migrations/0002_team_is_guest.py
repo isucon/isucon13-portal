@@ -14,6 +14,5 @@ class Migration(migrations.Migration):
             model_name='team',
             name='is_guest',
             field=models.BooleanField(blank=True, default=False, verbose_name='ゲストチーム'),
-            preserve_default=False,
         ),
     ]
