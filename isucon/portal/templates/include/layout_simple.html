@@ -18,6 +18,8 @@
   <script src="{% static "js/xsrf-token.js" %}"></script>
   <link href="{% static "css/main.css" %}" rel="stylesheet" type="text/css" media="screen">
   <script src="{% static "js/main.js" %}"></script>
+  <link rel="stylesheet" href="{% static "croppie/croppie.css" %}" />
+  <script src="{% static "croppie/croppie.js" %}"></script>
 </head>
 <body class="is-simple-layout {% if is_admin %}is-admin{% endif %}">
     <section class="hero is-fullheight">
@@ -25,5 +27,6 @@
       {% block content %}{% endblock %}
     </div>
   </section>
+  {% block script %}{% endblock %}
 </body>
 </html>

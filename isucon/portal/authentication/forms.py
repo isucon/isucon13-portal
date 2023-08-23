@@ -58,7 +58,7 @@ class TeamRegisterForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(TeamRegisterForm, self).clean()
-        if not cleaned_data['is_import_github_icon'] and cleaned_data['user_icon'] is None:
+        if not cleaned_data['is_import_github_icon'] and cleaned_data.get('user_icon', None) is None:
             raise ValidationError('アイコンが選択されていません')
 
         return cleaned_data
@@ -140,6 +140,9 @@ class JoinToTeamForm(forms.Form):
         cleaned_data = super(JoinToTeamForm, self).clean()
         team_id = cleaned_data.get('team_id')
         team_password = cleaned_data.get('team_password')
+
+        if not cleaned_data['is_import_github_icon'] and cleaned_data.get('user_icon', None) is None:
+            raise ValidationError('アイコンが選択されていません')
 
         try:
             team = Team.objects.get(id=int(team_id), password=team_password)
