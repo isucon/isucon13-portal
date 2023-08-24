@@ -12,7 +12,7 @@ ISUCON13 Portal
 ローカル環境では、SQLite3を利用して開発をすることができます。
 
 ```bash
-git clone git@github.com:chibiegg/isucon13-portal.git
+git clone git@github.com:isucon/isucon13-portal.git
 cd isucon13-portal
 pipenv install
 pipenv run python manage.py migrate
