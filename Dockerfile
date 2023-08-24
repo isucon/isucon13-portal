@@ -30,6 +30,7 @@ RUN rm -v /var/www/html/*
 RUN ln -s /opt/app/static /var/www/html/static
 ADD files/nginx.conf /etc/nginx/nginx.conf
 ADD files/default.conf /etc/nginx/sites-enabled/default
+ADD files/.htpasswd /etc/nginx/.htpasswd
 
 EXPOSE 80
 
