@@ -228,7 +228,7 @@ REDIS_HOST = '127.0.0.1'
 RANKING_TOPN = 30
 
 # Slack
-SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/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"
+SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/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"
 
 # 外部リンク
 MANUAL_URL = '' # TODO:
