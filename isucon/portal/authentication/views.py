@@ -41,10 +41,10 @@ def create_team(request):
         # フォームの内容が不正なら戻す
         return render(request, "create_team.html", {'form': form, 'username': request.user, 'email': request.user.email})
 
-    form.save()
+    user = form.save()
 
     try:
-        notify_registration()
+        notify_registration(user, "新しいチームが作成されました")
     except:
         pass
 
@@ -66,10 +66,10 @@ def join_team(request):
         # フォームの内容が不正なら戻す
         return render(request, "join_team.html", {'form': form, 'username': request.user})
 
-    form.save()
+    user = form.save()
 
     try:
-        notify_registration()
+        notify_registration(user, "チームにメンバーが追加されました")
     except:
         pass
 
