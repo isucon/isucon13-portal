@@ -10,7 +10,7 @@
   <meta http-equiv="Content-Script-Type" content="text/javascript">
   <link rel="icon" type="image/png" href="{% static "img/isucon_icon.png" %}">
   <link href="{% static "css/bulma.min.css" %}" rel="stylesheet" type="text/css">
-  <link href="{% static "css/fontawesome.css" %}" rel="stylesheet" type="text/css">
+  <link href="{% static "fontawesome/css/all.css" %}" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
   <link href="{% static "css/main.css" %}" rel="stylesheet" type="text/css" media="screen">
   <link href="{% static "css/landing.css" %}" rel="stylesheet" type="text/css" media="screen">
@@ -39,16 +39,16 @@
               <span class="navbar-item">
                 <a class="button is-white is-outlined" target="_blank" href="{{ twitter_url }}">
                   <span class="icon">
-                    <i class="fab fa-twitter"></i>
+                    <i class="fab fa-x-twitter"></i>
                   </span>
-                  <span>Twitter</span>
+                  <span>ISUCON 公式アカウント</span>
                 </a>
               </span>
               {% if regulation_url %}
               <span class="navbar-item">
                 <a class="button is-white is-outlined" target="_blank" href="{{ regulation_url }}">
                   <span class="icon">
-                    <i class="fab fa-clipboard-list"></i>
+                    <i class="fa fa-clipboard-list"></i>
                   </span>
                   <span>Regulation</span>
                 </a>
@@ -103,6 +103,11 @@
                 登録期間: {{ registration_end_at | date:"Y年m月d日 H時i分" }} まで
                 <br>
                 ※募集数の上限に達し次第、締め切る場合があります
+                <ul>
+                  <li>8月30日(水)10:00〜　第一期 220枠</li>
+                  <li>9月4日(月)20:00〜　第二期 200枠</li>
+                  <li>9月9日(土)10:00〜　第三期 200枠</li>
+                </ul>
             </h2>
             <div>
               {% if user.team %}
