@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
     'widget_tweaks',
+    'pgactivity',
+    'pglock',
     'isucon.portal',
     'isucon.portal.authentication',
     # 'isucon.portal.contest',
