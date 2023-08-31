@@ -1,4 +1,5 @@
 import csv
+import pglock
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib import messages
+from django.db import transaction
 
 from isucon.portal.authentication.models import Team
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
@@ -28,27 +30,31 @@ def create_team(request):
     if request.user.team:
         return redirect("team_settings")
 
-    # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
-    if Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM:
-        return render(request, "create_team_max.html")
+    with transaction.atomic():
+        pglock.model("authentication.Team", side_effect=pglock.Raise)
 
-    user = request.user
-    initial = {
-        "email": user.email,
-    }
-    form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, initial=initial)
-    if request.method != "POST" or not form.is_valid():
-        # フォームの内容が不正なら戻す
-        return render(request, "create_team.html", {'form': form, 'username': request.user, 'email': request.user.email})
+        # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
+        if Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM:
+            return render(request, "create_team_max.html")
 
-    user = form.save()
+        user = request.user
+        initial = {
+            "email": user.email,
+        }
+        form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, initial=initial)
+        if request.method != "POST" or not form.is_valid():
+            # フォームの内容が不正なら戻す
+            return render(request, "create_team.html", {'form': form, 'username': request.user, 'email': request.user.email})
 
-    try:
-        notify_registration(user, "新しいチームが作成されました")
-    except:
-        pass
+        user = form.save()
 
-    return redirect("team_settings")
+        try:
+            notify_registration(user, "新しいチームが作成されました")
+        except:
+            pass
+
+        return redirect("team_settings")
+
 
 @check_registration
 @login_required
