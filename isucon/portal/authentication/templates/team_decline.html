@@ -1,0 +1,69 @@
+{% extends "include/layout.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="column is-9">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="/">ISUCON13</a></li>
+            <li><a href="{% url "team_settings" %}">Team Settings</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Decline</a></li>
+        </ul>
+    </nav>
+
+
+    <form method="post">
+      <input type="hidden" name="action" value="team"/>
+      {% csrf_token %}
+
+      <section class="section">
+        <h1 class="title">チーム登録の辞退</h1>
+        <div class="box">
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">チーム名</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input class="input is-static" value="{{ user.team.name }}" readonly>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">チーム番号</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input class="input is-static" value="{{ user.team.id }}" readonly>
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+        <article class="message is-danger">
+          <div class="message-body">
+            本当にこのチームの参加登録を辞退しますか？
+            <br>
+            操作後に辞退を取り消すことはできません。
+            <br>
+            同一ユーザーによるチームの作成はできません。辞退後は別のチームへの参加のみ可能です。
+          </div>
+        </article>
+          <a class="button" href="{% url "team_settings" %}">操作せずに戻る</a>
+          <button type="submit" name="action" value="decline" class="button is-danger">辞退する</button>
+        </div>
+      </section>
+
+    </form>
+
+</div>
+
+
+{% endblock %}
+

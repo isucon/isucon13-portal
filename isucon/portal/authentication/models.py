@@ -9,7 +9,6 @@ from django.utils import timezone
 from django.conf import settings
 from stdimage.models import StdImageField
 
-from isucon.portal.models import LogicalDeleteMixin
 from isucon.portal import utils as portal_utils
 
 locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
@@ -25,9 +24,19 @@ class User(AbstractUser):
     def __str__(self):
         return self.display_name
 
-class Team(LogicalDeleteMixin, models.Model):
+
+class TeamManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(declined_at__isnull=True, is_active=True)
+
+
+class Team(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チーム"
+
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField("最終更新日時", auto_now=True)
+    declined_at = models.DateTimeField("辞退日時", blank=True, null=True)
 
     owner = models.OneToOneField(User, verbose_name="オーナー", on_delete=models.PROTECT, related_name="+")
     is_active = models.BooleanField("有効", default=True, blank=True)
@@ -37,6 +46,9 @@ class Team(LogicalDeleteMixin, models.Model):
     is_guest = models.BooleanField("ゲストチーム", blank=True, default=False)
 
     # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
+
+    objects = TeamManager()
+    original_manager = models.Manager()
 
     @property
     def participate_at(self):
@@ -57,6 +69,17 @@ class Team(LogicalDeleteMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+    def decline(self):
+        # チーム辞退処理
+        if self.declined_at:
+            # すでに処理済み
+            return
+
+        self.declined_at = timezone.now()
+        self.is_active = False
+        self.save()
+        User.objects.filter(team=self).update(team=None)
 
     @property
     def score(self):

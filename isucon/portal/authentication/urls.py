@@ -16,6 +16,7 @@ urlpatterns = [
     path('teams.csv', views.team_list_csv, name="team_list_csv"),
     path('settings/team/', views.team_settings, name="team_settings"),
     path('settings/icon/', views.update_user_icon, name="update_user_icon"),
+    path('settings/decline/', views.decline, name="decline"),
 ]
 
 if settings.DEBUG:

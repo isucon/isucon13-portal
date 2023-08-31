@@ -18,7 +18,7 @@ from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 class LoginView(DjangoLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["create_team_limited"] = Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM
+        context["create_team_limited"] = Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM
         return context
 
 
@@ -29,12 +29,18 @@ def create_team(request):
     # 登録済み
     if request.user.team:
         return redirect("team_settings")
+    
+    # 同一人物によるチームの作成は不可
+    if Team.original_manager.filter(owner=request.user).exists():
+        messages.warning(request, "過去にチーム作成をしたユーザーはチームの作成はできません")
+        return redirect("index")
+
 
     with transaction.atomic():
         pglock.model("authentication.Team", side_effect=pglock.Raise)
 
         # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
-        if Team.objects.filter(is_guest=False, is_active=True).count() >= settings.MAX_TEAM_NUM:
+        if Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM:
             return render(request, "create_team_max.html")
 
         user = request.user
@@ -127,7 +133,21 @@ def update_user_icon(request):
     return redirect("team_settings")
 
 
+@team_is_authenticated
+def decline(request):
+    if request.user.team.owner != request.user:
+        messages.warning(request, "リーダーのみがチームの辞退操作ができます")
+        return redirect("team_settings")
 
+    if request.method == "POST":
+        if request.POST.get("action") == "decline":
+            request.user.team.decline()
+            messages.success(request, "チーム登録を辞退しました")
+            return redirect("index")
+
+    context = {
+    }
+    return render(request, "team_decline.html", context)
 
 
 def team_list(request):
