@@ -1,3 +1,6 @@
+from typing import Any
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib import admin
 from django.utils.safestring import mark_safe
@@ -30,8 +33,11 @@ admin.site.register(User, UserAdmin)
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "owner", "is_active"]
+    list_display = ["id", "name", "owner", "is_active", "created_at", "declined_at"]
     list_filter = ["is_active"]
     search_fields = ["name"]
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        return Team.original_manager.all()
 
 admin.site.register(Team, TeamAdmin)
