@@ -4,9 +4,9 @@
 
 {% block content %}
 
-{% if user and user.is_authenticated and user.team %}
+{% if user and user.is_authenticated %}
 <script>
-    document.location = "{% url 'dashboard' %}";
+    document.location = "{% url 'register' %}";
 </script>
 {% else %}
 
@@ -26,54 +26,17 @@
             </div>
         </article>
         {% endif %}
-        {% if user and user.is_authenticated %}
-        <h2>Hello {{ user.get_full_name|default:user.username }}!</h2>
-        {% if not user.team %}
-        <h2>新しくチームを作成するか、参加するチームの情報を入力してください</h2>
-
-        <div class="box">
-            {% if create_team_limited %}
-            <span>
-              <button class="button is-block is-warning is-large is-fullwidth" disabled>チーム数の上限に達したため、新規のチーム登録はできません</button>
-            </span>
-            {% else %}
-            <span>
-                <a href="{% url 'create_team' %}">
-                    <button class="button is-block is-info is-large is-fullwidth">新規チームを作成</button>
-                </a>
-            </span>
-            {% endif %}
-            <br>
-            <span>
-                <a href="{% url 'join_team' %}">
-                    <button class="button is-block is-info is-large is-fullwidth">既存チームに参加</button>
-                </a>
-            </span>
-        </div>
-
-        {% else %}
-
-        <a href="{% url 'dashboard' %}">
-            <button class="button is-block is-info is-large is-fullwidth">Go to Dashboard</button>
-        </a>
-        <a href="{% url 'logout' %}">
-            <button class="button is-block is-info is-large is-fullwidth">logout</button>
-        </a>
-        {% endif %}
-        {% else %}
 
         <h3 class="title has-text-grey">Login</h3>
         <p class="subtitle has-text-grey">Please login to proceed.</p>
         <div class="box">
-            <a href="{% url 'social:begin' 'github' %}?next={{ request.path }}" class="button is-large is-fullwidth is-info">
+            <a href="{% url 'social:begin' 'github' %}?next={{ next }}" class="button is-large is-fullwidth is-info">
                 <span class="icon is-medium">
                     <i class="fab fa-github"></i>
                 </span>
                 <span>GitHubアカウントでログインする</span>
             </a>
         </div>
-        {% endif %}
-
     </div>
 </div>
 {% endif %}

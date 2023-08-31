@@ -148,6 +148,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/opt/app/static/'
 
 LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "register"
 
 # アイコンの最大アップロードファイルサイズ(5MB)
 MAX_UPLOAD_SIZE = 5242880
@@ -218,12 +219,16 @@ BENCHMARK_ABORT_TIMEOUT_SEC = 300
 # チームに所属できる最大人数
 MAX_TEAM_MEMBER_NUM = 3
 # 最大チーム数
-MAX_TEAM_NUM = 220
+MAX_TEAM_NUM = 0
 
 # チームパスワードとして使う文字群
 PASSWORD_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'
 # チームパスワードの文字数
 PASSWORD_LENGTH = 20
+
+#クーポンとして使う文字列群
+COUPON_LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+COUPON_LENGTH = 40
 
 # Redis
 REDIS_HOST = '127.0.0.1'
@@ -239,3 +244,4 @@ DISCORD_URL = '' # TODO:
 ISUCON_OFFICIAL_URL = 'http://isucon.net/'
 TWITTER_URL = 'https://twitter.com/isucon_official'
 TERM_URL = 'https://isucon.net/archives/57774416.html'
+BASE_URL = "https://{}".format(os.environ.get("DJANGO_ALLOWED_HOST", "") or "localhost:8000")

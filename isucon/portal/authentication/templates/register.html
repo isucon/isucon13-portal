@@ -1,0 +1,50 @@
+{% extends "include/layout_simple.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container has-text-centered">
+    <figure class="logo">
+        <img src="{% static "img/isucon13_logo.png" %}" width="400px">
+    </figure>
+    <div class="column is-8 is-offset-2">
+        {% if form.errors %}
+        <article class="message is-danger">
+            <div class="message-header">
+                <p>Oops!</p>
+            </div>
+            <div class="message-body">
+                <strong>入力情報にエラーがあります</strong><br>
+                {{ form.errors }}
+            </div>
+        </article>
+        {% endif %}
+
+        <h2>Hello {{ user.get_full_name|default:user.username }}!</h2>
+
+        <h2>新しくチームを作成するか、参加するチームの情報を入力してください</h2>
+
+        <div class="box">
+            {% if create_team_limited %}
+            <span>
+              <button class="button is-block is-warning is-large is-fullwidth" disabled>チーム数の上限に達したため、新規のチーム登録はできません</button>
+            </span>
+            {% else %}
+            <span>
+                <a href="{% url 'create_team' %}">
+                    <button class="button is-block is-info is-large is-fullwidth">新規チームを作成</button>
+                </a>
+            </span>
+            {% endif %}
+            <br>
+            <span>
+                <a href="{% url 'join_team' %}">
+                    <button class="button is-block is-info is-large is-fullwidth">既存チームに参加</button>
+                </a>
+            </span>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

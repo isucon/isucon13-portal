@@ -49,6 +49,7 @@ class TeamRegisterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
+        self.coupon = kwargs.pop("coupon")
         super().__init__(*args, **kwargs)
 
     def clean_user_icon(self):
@@ -69,7 +70,17 @@ class TeamRegisterForm(forms.Form):
         # パスワードとして使う文字群から指定文字数ランダムに選択してチームパスワードとする
         password = ''.join(random.choice(settings.PASSWORD_LETTERS) for i in range(settings.PASSWORD_LENGTH))
 
-        team = Team.objects.create(name=self.cleaned_data['name'], password=password, owner=user)
+        team_data = {
+            "name": self.cleaned_data['name'],
+            "password": password,
+            "owner": user,
+        }
+        if self.coupon:
+            team_data.update({
+                "is_guest": True,
+            })
+
+        team = Team.objects.create(**team_data)
 
         user.team = team
         user.is_student = self.cleaned_data['is_student']
@@ -89,6 +100,9 @@ class TeamRegisterForm(forms.Form):
         else:
             user.icon = self.cleaned_data['user_icon']
         user.save()
+
+        if self.coupon:
+            self.coupon.use(team)
 
         return user
 

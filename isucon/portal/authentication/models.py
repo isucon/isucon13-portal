@@ -1,6 +1,7 @@
 import os
 import datetime
 import locale
+import random
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -90,3 +91,27 @@ class Team(models.Model):
             "latest_status": "Dummy",
             "updated_at": timezone.now(),
         }
+
+def default_register_coupon_token():
+    return ''.join(random.choice(settings.COUPON_LETTERS) for i in range(settings.COUPON_LENGTH))
+
+
+class RegisterCoupon(models.Model):
+    class Meta:
+        verbose_name = verbose_name_plural = "登録クーポン"
+        ordering = ("-created_at",)
+
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField("最終更新日時", auto_now=True)
+    used_at = models.DateTimeField("利用日時", blank=True, null=True)
+
+    name = models.CharField("送付先", max_length=200)
+    team = models.OneToOneField(Team, verbose_name="チーム", blank=True, null=True, on_delete=models.SET_NULL)
+    token = models.CharField("トークン", max_length=100, unique=True, default=default_register_coupon_token)
+
+    def use(self, team):
+        if self.used_at:
+            raise ValueError("Already used")
+        self.used_at = timezone.now()
+        self.team = team
+        self.save()

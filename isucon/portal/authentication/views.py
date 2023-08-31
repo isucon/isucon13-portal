@@ -9,17 +9,26 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib import messages
 from django.db import transaction
 
-from isucon.portal.authentication.models import Team
+from isucon.portal.authentication.models import Team, RegisterCoupon
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
 from isucon.portal.authentication.decorators import team_is_authenticated, check_registration
 from isucon.portal.authentication.notify import notify_registration
 from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 
 class LoginView(DjangoLoginView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["create_team_limited"] = Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM
-        return context
+    pass
+
+
+@login_required
+def register(request):
+    # 登録済み
+    if request.user.team:
+        return redirect("team_settings")
+
+    context = {
+        "create_team_limited": Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM,
+    }
+    return render(request, "register.html", context)
 
 
 @check_registration
@@ -37,20 +46,38 @@ def create_team(request):
 
 
     with transaction.atomic():
-        pglock.model("authentication.Team", side_effect=pglock.Raise)
+        pglock.model("authentication.Team", side_effect=pglock.Return)
+
+        coupon_token = request.GET.get("token")
+        coupon = None
+        if coupon_token:
+            try:
+                coupon = RegisterCoupon.objects.get(token=coupon_token)
+            except RegisterCoupon.DoesNotExist:
+                messages.warning(request, "指定されたクーポンコードは存在しません")
+            else:
+                if coupon.used_at:
+                    messages.warning(request, "指定されたクーポンコードは利用済みです")
+                    coupon = None
 
         # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
-        if Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM:
+        if not coupon and Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM:
             return render(request, "create_team_max.html")
 
         user = request.user
         initial = {
             "email": user.email,
         }
-        form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, initial=initial)
+        form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, coupon=coupon, initial=initial)
         if request.method != "POST" or not form.is_valid():
+            context = {
+                'form': form,
+                'username': request.user,
+                'email': request.user.email,
+                'coupon': coupon,
+            }
             # フォームの内容が不正なら戻す
-            return render(request, "create_team.html", {'form': form, 'username': request.user, 'email': request.user.email})
+            return render(request, "create_team.html", context)
 
         user = form.save()
 

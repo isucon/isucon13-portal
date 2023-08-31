@@ -101,11 +101,25 @@
               {% endfor %}
             </div>
             <div class="message-body">
-                <strong>Login FAILED!!</strong><br>
+                <strong>入力内容にエラーがあります</strong><br>
                 {{ form.errors }}
             </div>
         </article>
         {% endif %}
+        {% if coupon %}
+        <article class="message is-warning">
+            <div class="message-header">
+                <p>クーポンコードを利用した登録です</p>
+            </div>
+        </article>
+        {% endif %}
+        {% for message in messages %}
+        <article class="message is-{{ message.tags }}">
+          <div class="message-body">
+            {{ message }}
+          </div>
+        </article>
+        {% endfor %}
         {% if user and user.is_authenticated %}
         {% if not user.team %}
         <div class="notification is-warning">
@@ -128,7 +142,7 @@
         <div class="box">
             <h1 class="title">新しくチームを作成する</h1>
 
-            <form enctype="multipart/form-data" method="post" action="{% url 'create_team' %}">
+            <form enctype="multipart/form-data" method="post">
                 {% csrf_token %}
 
                 <h2 class="subtitle">チーム情報</h2>

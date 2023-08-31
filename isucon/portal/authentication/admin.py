@@ -4,8 +4,10 @@ from django.http.request import HttpRequest
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.urls import reverse
+from django.conf import settings
 
-from isucon.portal.authentication.models import User, Team
+from isucon.portal.authentication.models import User, Team, RegisterCoupon
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ["id", "username", "display_name", "team", "is_student", "is_staff"]
@@ -41,3 +43,14 @@ class TeamAdmin(admin.ModelAdmin):
         return Team.original_manager.all()
 
 admin.site.register(Team, TeamAdmin)
+
+
+class RegisterCouponAdmin(admin.ModelAdmin):
+    list_display = ("id", "created_at", "used_at", "name", "team", "url")
+    search_fields = ("name", )
+
+
+    def url(self, obj):
+        return "{}{}?token={}".format(settings.BASE_URL, reverse("create_team"), obj.token)
+
+admin.site.register(RegisterCoupon, RegisterCouponAdmin)
