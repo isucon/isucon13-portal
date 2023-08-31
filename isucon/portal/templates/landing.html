@@ -91,6 +91,16 @@
 
       <div class="hero-body">
         <div class="container has-text-centered">
+
+          {% for message in messages %}
+          <article class="message is-{{ message.tags }}">
+            <div class="message-body">
+              {{ message }}
+            </div>
+          </article>
+          {% endfor %}
+  
+
           <div class="column is-6 is-offset-3">
             <div>
               <img src="{% static "img/isucon13_white.png" %}" width="400px">

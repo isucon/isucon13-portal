@@ -5,7 +5,6 @@ import locale
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.conf import settings
 from stdimage.models import StdImageField
@@ -79,6 +78,7 @@ class Team(models.Model):
 
         self.declined_at = timezone.now()
         self.is_active = False
+        self.save()
         User.objects.filter(team=self).update(team=None)
 
     @property
