@@ -101,7 +101,7 @@
           {% endfor %}
   
 
-          <div class="column is-6 is-offset-3">
+          <div>
             <div>
               <img src="{% static "img/isucon13_white.png" %}" width="400px">
             </div>
@@ -110,14 +110,14 @@
               大好評参加登録受付中！
             </h1>
             <h2 class="subtitle">
-                登録期間: {{ registration_end_at | date:"Y年m月d日 H時i分" }} まで
-                <br>
-                ※募集数の上限に達し次第、締め切る場合があります
                 <ul>
                   <li>8月30日(水)10:00〜　第一期 220枠</li>
                   <li>9月4日(月)20:00〜　第二期 200枠</li>
                   <li>9月9日(土)10:00〜　第三期 200枠</li>
                 </ul>
+                ※募集数の上限に達し次第、締め切る場合があります
+                <br>
+                登録後のチームに対するメンバーの追加・チーム情報の変更は10月31日(火)16:00まで 
             </h2>
             <div>
               {% if user.team %}
@@ -137,14 +137,14 @@
               Coming soon!
             </h1>
             <h2 class="subtitle">
-                登録期間: {{ registration_start_at | date:"Y年m月d日 H時i分" }} から {{ registration_end_at | date:"Y年m月d日 H時i分" }} まで
-                <br>
-                ※募集数の上限に達し次第、締め切る場合があります
                 <ul>
                   <li>8月30日(水)10:00〜　第一期 220枠</li>
                   <li>9月4日(月)20:00〜　第二期 200枠</li>
                   <li>9月9日(土)10:00〜　第三期 200枠</li>
                 </ul>
+                ※募集数の上限に達し次第、締め切る場合があります
+                <br>
+                登録後のチームに対するメンバーの追加・チーム情報の変更は10月31日(火)16:00まで 
             </h2>
             {% endif %}
           </div>
