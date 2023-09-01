@@ -10,8 +10,9 @@ from isucon.portal.authentication import views
 urlpatterns = [
     path('login/', views.LoginView.as_view(template_name="login.html"), name="login"),
     path('logout/', auth_views.LogoutView.as_view(template_name="logout.html"), name="logout"),
-    path('create_team/', views.create_team, name="create_team"),
-    path('join_team/', views.join_team, name="join_team"),
+    path('register/', views.register, name="register"),
+    path('register/create_team/', views.create_team, name="create_team"),
+    path('register/join_team/', views.join_team, name="join_team"),
     path('teams/', views.team_list, name="team_list"),
     path('teams.csv', views.team_list_csv, name="team_list_csv"),
     path('settings/team/', views.team_settings, name="team_settings"),
