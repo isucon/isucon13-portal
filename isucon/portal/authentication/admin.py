@@ -9,6 +9,12 @@ from django.conf import settings
 
 from isucon.portal.authentication.models import User, Team, RegisterCoupon
 
+
+admin.site.site_title = 'ISUCON Portal'
+admin.site.site_header = 'ISUCON Portal'
+admin.site.index_title = '管理'
+
+
 class UserAdmin(admin.ModelAdmin):
     list_display = ["id", "username", "display_name", "team", "is_student", "is_staff"]
     list_filter = ["is_staff", "is_student", "team"]
