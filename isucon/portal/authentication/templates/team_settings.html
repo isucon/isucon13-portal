@@ -9,10 +9,10 @@
         </ul>
     </nav>
 
-    {% if form.is_registration_available %}
+    {% if form.is_team_modify_available %}
       <article class="message is-info">
         <div class="message-body">
-          チームメンバーの変更や登録情報の変更は {{ registration_end_at | date:"Y年m月d日 H時i分" }} までです。
+          チームメンバーの変更や登録情報の変更は {{ team_modify_end_at | date:"Y年m月d日 H時i分" }} までです。
         </div>
       </article>
     {% else %}
@@ -105,9 +105,9 @@
           </div>
           {% endif %}
 
-
-          <button type="submit" class="button is-primary">保存</button>
-
+          {% if is_team_modify_available %}
+            <button type="submit" class="button is-primary">保存</button>
+          {% endif %}
 
         </div>
       </section>
@@ -123,7 +123,7 @@
 
           {% for member in team_members %}
           <div class="item" style="width: 200px; padding-left: auto; text-align: center;">
-            {% if member.id == user.id %}
+            {% if member.id == user.id and is_team_modify_available %}
               {# 編集可能 #}
               <form method="post">
                 {% csrf_token %}
@@ -154,9 +154,11 @@
       </div>
     </section>
 
-    <section class="has-text-centered">
-      <a class="button is-danger" href="{% url "decline" %}">チーム登録の辞退</a>
-    </section>
+    {% if is_team_modify_available %}
+      <section class="has-text-centered">
+        <a class="button is-danger" href="{% url "decline" %}">チーム登録の辞退</a>
+      </section>
+    {% endif %}
 </div>
 
 

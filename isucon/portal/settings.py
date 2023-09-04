@@ -197,6 +197,7 @@ AWS_STORAGE_BUCKET_NAME = "isucon13-portal-dev"
 # 登録期間
 REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 1, 10, 0, 0)
 REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 10, 9, 0, 0)
+TEAM_MODIFY_END_AT = portal_utils.get_jst_datetime(2023, 10, 31, 16, 0, 0)
 
 # コンテスト開催期間
 # 日付

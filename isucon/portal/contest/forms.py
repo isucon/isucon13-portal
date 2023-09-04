@@ -2,7 +2,6 @@ import ipaddress
 
 from django import forms
 
-from isucon.portal.authentication.decorators import is_registration_available
 from isucon.portal.authentication.models import Team, User
 from isucon.portal.contest.models import Server
 
