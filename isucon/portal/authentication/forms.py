@@ -57,6 +57,12 @@ class TeamRegisterForm(forms.Form):
             return None
         return check_uploaded_filesize(self.cleaned_data['user_icon'])
 
+    def clean_name(self):
+        name = self.cleaned_data.get("name", "")
+        if Team.objects.filter(name=name).exists():
+            raise ValidationError('チーム名が重複しています')
+        return name
+
     def clean(self):
         cleaned_data = super(TeamRegisterForm, self).clean()
         if not cleaned_data['is_import_github_icon'] and cleaned_data.get('user_icon', None) is None:
@@ -218,7 +224,11 @@ class TeamForm(forms.ModelForm):
     def clean_name(self):
         if not self.is_registration_available:
             return self.instance.name
-        return self.cleaned_data.get("name", "")
+
+        name = self.cleaned_data.get("name", "")
+        if Team.objects.exclude(id=self.instance.id).filter(name=name).exists():
+            raise ValidationError('チーム名が重複しています')
+        return name
 
 
 class UserForm(forms.ModelForm):
