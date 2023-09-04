@@ -15,6 +15,11 @@ def is_registration_available():
     now = timezone.now()
     return settings.REGISTRATION_START_AT <= now <= settings.REGISTRATION_END_AT
 
+def is_team_modify_available():
+    """チーム情報変更可能か日時チェック"""
+    now = timezone.now()
+    return now <= settings.TEAM_MODIFY_END_AT
+
 def check_registration(function):
     @functools.wraps(function)
     def _function(request, *args, **kwargs):

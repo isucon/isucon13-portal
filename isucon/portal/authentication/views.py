@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from isucon.portal.authentication.models import Team, RegisterCoupon
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
-from isucon.portal.authentication.decorators import team_is_authenticated, check_registration
+from isucon.portal.authentication.decorators import team_is_authenticated, is_team_modify_available, check_registration
 from isucon.portal.authentication.notify import notify_registration
 from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 
@@ -125,6 +125,11 @@ def join_team(request):
 def team_settings(request):
     form = TeamForm(instance=request.user.team)
     user_form = UserForm(instance=request.user)
+
+    if request.method == "POST" and not is_team_modify_available():
+        messages.error(request, "チーム情報の変更期間を過ぎています")
+        return redirect("team_settings")
+
     if request.method == "POST" and request.POST.get("action") == "team":
         form = TeamForm(request.POST, instance=request.user.team)
         if form.is_valid():
@@ -168,6 +173,10 @@ def update_user_icon(request):
 
 @team_is_authenticated
 def decline(request):
+    if not is_team_modify_available():
+        messages.error(request, "チーム情報の変更期間を過ぎています")
+        return redirect("team_settings")
+
     if request.user.team.owner != request.user:
         messages.warning(request, "リーダーのみがチームの辞退操作ができます")
         return redirect("team_settings")

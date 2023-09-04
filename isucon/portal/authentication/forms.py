@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core import files
 
 from isucon.portal.authentication.models import Team, User
-from isucon.portal.authentication.decorators import is_registration_available
+from isucon.portal.authentication.decorators import is_team_modify_available
 from isucon.portal import settings
 
 class TeamRegisterForm(forms.Form):
@@ -213,16 +213,16 @@ class TeamForm(forms.ModelForm):
 
 
     def __init__(self, *args, **kwargs):
-        self.is_registration_available = is_registration_available()
+        self.is_team_modify_available = is_team_modify_available()
 
         super().__init__(*args, **kwargs)
 
-        if not self.is_registration_available:
+        if not self.is_team_modify_available:
             self.fields['name'].widget.attrs['readonly'] = True
             self.fields['name'].widget.attrs['class'] = 'is-static'
 
     def clean_name(self):
-        if not self.is_registration_available:
+        if not self.is_team_modify_available:
             return self.instance.name
 
         name = self.cleaned_data.get("name", "")

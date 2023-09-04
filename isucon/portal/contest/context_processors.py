@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils import timezone
 
-from isucon.portal.authentication.decorators import is_registration_available
+from isucon.portal.authentication.decorators import is_registration_available, is_team_modify_available
 # from isucon.portal.contest.models import Server, Information
 
 def settings_url(request):
@@ -15,7 +15,9 @@ def settings_url(request):
         'term_url': settings.TERM_URL,
         'registration_start_at': settings.REGISTRATION_START_AT,
         'registration_end_at': settings.REGISTRATION_END_AT,
+        'team_modify_end_at': settings.TEAM_MODIFY_END_AT,
         'is_registration_available': is_registration_available(),
+        'is_team_modify_available': is_team_modify_available(),
         'is_now_on_contest': False,
         'informations': [],
         'show_result_enabled': settings.SHOW_RESULT_AFTER <= timezone.now(),
