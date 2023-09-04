@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib import messages
 from django.db import transaction
+from django.utils import timezone
 
 from isucon.portal.authentication.models import Team, RegisterCoupon
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
@@ -31,7 +32,7 @@ def register(request):
     return render(request, "register.html", context)
 
 
-@check_registration
+# @check_registration
 @login_required
 def create_team(request):
 
@@ -60,9 +61,14 @@ def create_team(request):
                     messages.warning(request, "指定されたクーポンコードは利用済みです")
                     coupon = None
 
-        # 招待チーム (スポンサー等) 以外のチーム数で申し込みを制限する
-        if not coupon and Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM:
-            return render(request, "create_team_max.html")
+        # 招待チーム (スポンサー等) 以外の申し込みを制限する
+        if not coupon:
+            if not settings.REGISTRATION_START_AT <= timezone.now() <= settings.REGISTRATION_END_AT:
+                # 登録期間
+                return redirect("index")
+            if Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM:
+                # チーム数制限
+                return render(request, "create_team_max.html")
 
         user = request.user
         initial = {
@@ -89,7 +95,7 @@ def create_team(request):
         return redirect("team_settings")
 
 
-@check_registration
+# @check_registration
 @login_required
 def join_team(request):
 

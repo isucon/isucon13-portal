@@ -130,7 +130,6 @@
               </a>
               <p>参加登録にはGitHubのアカウントを利用します</p>
               {% endif %}
-
             </div>
             {% else %}
             <h1 class="title">
@@ -144,7 +143,21 @@
                 </ul>
                 ※募集数の上限に達し次第、締め切る場合があります
                 <br>
-                登録後のチームに対するメンバーの追加・チーム情報の変更は10月31日(火)16:00まで 
+                登録後のチームに対するメンバーの追加・チーム情報の変更は10月31日(火)16:00まで
+
+                <br>
+                <div>
+                  {% if user.team %}
+                  <a class="button is-white is-outlined is-large" href="{% url "team_settings" %}">
+                    チーム登録情報はこちら
+                  </a>
+                  {% else %}
+                  <a class="button is-white is-outlined is-large" href="{% url "login" %}">
+                    参加登録！
+                  </a>
+                  <p>参加登録にはGitHubのアカウントを利用します</p>
+                  {% endif %}
+                </div>
             </h2>
             {% endif %}
           </div>
