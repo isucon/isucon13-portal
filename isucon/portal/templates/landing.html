@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  <section class="hero is-info is-fullheight">
+  <div class="hero is-info is-fullheight">
     <div class="hero-head">
       <nav class="navbar">
         <div class="container">
@@ -54,6 +54,14 @@
                 </a>
               </span>
               {% endif %}
+              <span class="navbar-item">
+                <a class="button is-white is-outlined" href="{% url "team_list" %}">
+                  <span class="icon">
+                    <i class="fas fa-list"></i>
+                  </span>
+                  <span>参加チーム</span>
+                </a>
+              </span>
               {% if user and user.is_authenticated and user.team %}
               <span class="navbar-item">
                 <a class="button is-white is-outlined" href="{% url "team_settings" %}">
@@ -164,7 +172,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </body>
 
 </html>
