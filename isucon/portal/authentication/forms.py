@@ -166,7 +166,7 @@ class JoinToTeamForm(forms.Form):
 
         try:
             team = Team.objects.get(id=int(team_id), password=team_password)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, TypeError):
             raise ValidationError('チーム番号かチームパスワードが間違っています')
 
         if len(User.objects.filter(team=team)) >= settings.MAX_TEAM_MEMBER_NUM:
