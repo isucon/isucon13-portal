@@ -31,11 +31,17 @@
               <button class="button is-block is-warning is-large is-fullwidth" disabled>チーム数の上限に達したため、新規のチーム登録はできません</button>
             </span>
             {% else %}
-            <span>
-                <a href="{% url 'create_team' %}">
-                    <button class="button is-block is-info is-large is-fullwidth">新規チームを作成</button>
-                </a>
-            </span>
+                {% if is_registration_available %}
+                    <span>
+                        <a href="{% url 'create_team' %}">
+                            <button class="button is-block is-info is-large is-fullwidth">新規チームを作成</button>
+                        </a>
+                    </span>
+                {% else %}
+                    <span>
+                        <button class="button is-block is-warning is-large is-fullwidth" disabled>チーム登録期間外です</button>
+                    </span>
+                {% endif %}
             {% endif %}
             <br>
             <span>

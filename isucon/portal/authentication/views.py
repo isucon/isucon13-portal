@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from isucon.portal.authentication.models import Team, RegisterCoupon
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
-from isucon.portal.authentication.decorators import team_is_authenticated, is_team_modify_available, check_registration
+from isucon.portal.authentication.decorators import team_is_authenticated, is_team_modify_available, is_registration_available
 from isucon.portal.authentication.notify import notify_registration
 from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 
@@ -27,6 +27,7 @@ def register(request):
         return redirect("team_settings")
 
     context = {
+        "is_registration_available": is_registration_available(),
         "create_team_limited": Team.objects.filter(is_guest=False).count() >= settings.MAX_TEAM_NUM,
     }
     return render(request, "register.html", context)
