@@ -33,8 +33,16 @@ class User(AbstractUser):
         return self.display_name
 
 
+    def join_discord(self):
+        """Discordサーバへ参加する"""
+        r = requests.put("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
+            "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
+        }, json={"access_token": self.discord_access_token})
+        print(r.text)
+
+
     def update_discord(self):
-        print(self.discord_expired_at)
+        # ユーザー名等の取得
         r = requests.get("https://discord.com/api/oauth2/@me", headers={
             "Authorization": "Bearer {}".format(self.discord_access_token),
         })
@@ -42,6 +50,15 @@ class User(AbstractUser):
         data = r.json()
         self.discord_id = data["user"]["id"]
         self.discord_username = data["user"]["username"]
+
+        # ニックネーム等を設定
+        r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
+            "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
+        }, json={
+            "nick": "{} ({})".format(self.display_name, self.team.name)
+        })
+        r.raise_for_status()
+
         self.save()
 
 
