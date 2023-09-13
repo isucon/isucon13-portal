@@ -1,5 +1,8 @@
 import csv
 import pglock
+import urllib.parse
+import requests
+import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -9,6 +12,7 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from django.urls import reverse
 
 from isucon.portal.authentication.models import Team, RegisterCoupon
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
@@ -213,3 +217,52 @@ def team_list_csv(request):
         writer.writerow(row)
 
     return response
+
+@login_required
+def discord_oauth_begin(request):
+    state = "state"
+    params = {
+        "client_id": settings.DISCORD_OAUTH_CLIENT_ID,
+        "redirect_uri": request.build_absolute_uri(reverse("discord_oauth_complete")),
+        "response_type": "code",
+        "scope": "identify",
+        "state": state,
+    }
+    url = "https://discord.com/api/oauth2/authorize?{}".format(urllib.parse.urlencode(params))
+    request.session["DISCORD_STATE"] = state
+    return redirect(url)
+
+
+@login_required
+def discord_oauth_complete(request):
+    code = request.GET.get("code")
+    state = request.GET.get("state")
+    expected_state = request.session.get("DISCORD_STATE", None)
+
+    if not all([code, state, expected_state]) or state != expected_state:
+        return redirect("discord_oauth_begin")
+    del request.session["DISCORD_STATE"]
+
+    data = {
+        'client_id': settings.DISCORD_OAUTH_CLIENT_ID,
+        'client_secret': settings.DISCORD_OAUTH_CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': request.build_absolute_uri(reverse("discord_oauth_complete")),
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    r = requests.post("https://discord.com/api/oauth2/token", data=data, headers=headers)
+    r.raise_for_status()
+    data = r.json()
+    print(data)
+
+    request.user.discord_access_token = data["access_token"]
+    request.user.discord_refresh_token = data["refresh_token"]
+    request.user.discord_expired_at = timezone.now() + datetime.timedelta(seconds=data["expires_in"])
+    request.user.update_discord()
+
+    messages.success(request, "Discordアカウントを接続しました")
+
+    return redirect("team_settings")

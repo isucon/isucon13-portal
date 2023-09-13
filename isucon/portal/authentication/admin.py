@@ -17,7 +17,7 @@ admin.site.index_title = '管理'
 
 
 class UserAdmin(DjangoUserAdmin):
-    list_display = ["id", "username", "display_name", "team", "is_student", "is_staff"]
+    list_display = ["id", "username", "display_name", "team", "discord_username", "is_student", "is_staff"]
     list_filter = ["is_staff", "is_student", "team"]
     search_fields = ("username", "display_name", "email",)
     readonly_fields = ["username", "icon_tag"]
@@ -25,6 +25,7 @@ class UserAdmin(DjangoUserAdmin):
     fieldsets = (
         (None, {'fields': ('display_name', 'password', 'team', 'icon', 'icon_tag')}),
         (_('Personal info'), {'fields': ('username', 'email', 'is_student')}),
+        ('Discord', {'fields': ('discord_id', 'discord_username', 'discord_expired_at')}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser'),
         }),

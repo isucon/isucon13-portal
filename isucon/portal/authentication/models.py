@@ -2,6 +2,7 @@ import os
 import datetime
 import locale
 import random
+import requests
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -22,8 +23,27 @@ class User(AbstractUser):
     is_student = models.BooleanField('学生フラグ', default=False, blank=True)
     display_name = models.CharField('表示名', max_length=100)
 
+    discord_id = models.CharField("Discord ID", max_length=200, blank=True)
+    discord_username = models.CharField("Discord Username", max_length=200, blank=True)
+    discord_access_token = models.CharField("Discord Token", max_length=200, blank=True)
+    discord_refresh_token = models.CharField("Discord Token", max_length=200, blank=True)
+    discord_expired_at = models.DateTimeField("Discord 有効期限", blank=True, null=True)
+
     def __str__(self):
         return self.display_name
+
+
+    def update_discord(self):
+        print(self.discord_expired_at)
+        r = requests.get("https://discord.com/api/oauth2/@me", headers={
+            "Authorization": "Bearer {}".format(self.discord_access_token),
+        })
+        r.raise_for_status()
+        data = r.json()
+        self.discord_id = data["user"]["id"]
+        self.discord_username = data["user"]["username"]
+        self.save()
+
 
 
 class TeamManager(models.Manager):
