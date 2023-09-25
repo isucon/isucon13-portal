@@ -2,6 +2,7 @@ import os
 import datetime
 import locale
 import random
+import requests
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -22,8 +23,57 @@ class User(AbstractUser):
     is_student = models.BooleanField('学生フラグ', default=False, blank=True)
     display_name = models.CharField('表示名', max_length=100)
 
+    discord_id = models.CharField("Discord ID", max_length=200, blank=True)
+    discord_username = models.CharField("Discord Username", max_length=200, blank=True)
+    discord_access_token = models.CharField("Discord Token", max_length=200, blank=True)
+    discord_refresh_token = models.CharField("Discord Token", max_length=200, blank=True)
+    discord_expired_at = models.DateTimeField("Discord 有効期限", blank=True, null=True)
+
     def __str__(self):
         return self.display_name
+
+
+    def join_discord(self):
+        """Discordサーバへ参加する"""
+        # ユーザー名等の取得
+        r = requests.get("https://discord.com/api/oauth2/@me", headers={
+            "Authorization": "Bearer {}".format(self.discord_access_token),
+        })
+        r.raise_for_status()
+        data = r.json()
+        self.discord_id = data["user"]["id"]
+        self.discord_username = data["user"]["username"]
+
+        join_data = {
+            "access_token": self.discord_access_token,
+        }
+        r = requests.put("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
+            "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
+        }, json=join_data)
+        r.raise_for_status()
+
+
+    def update_discord(self):
+        # ユーザー名等の取得
+        r = requests.get("https://discord.com/api/oauth2/@me", headers={
+            "Authorization": "Bearer {}".format(self.discord_access_token),
+        })
+        r.raise_for_status()
+        data = r.json()
+        self.discord_id = data["user"]["id"]
+        self.discord_username = data["user"]["username"]
+
+        # ニックネーム等を設定
+        r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
+            "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
+        }, json={
+            "nick": "{} ({})".format(self.display_name, self.team.name),
+            "roles":[settings.DISCORD_USER_ROLE_ID],
+        })
+        r.raise_for_status()
+
+        self.save()
+
 
 
 class TeamManager(models.Manager):

@@ -21,6 +21,7 @@ def settings_url(request):
         'is_now_on_contest': False,
         'informations': [],
         'show_result_enabled': settings.SHOW_RESULT_AFTER <= timezone.now(),
+        'discord_server_id': settings.DISCORD_SERVER_ID,
     }
 
 

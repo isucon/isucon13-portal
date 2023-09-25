@@ -24,7 +24,13 @@
       </article>
     {% endif %}
 
-
+    {% if not user.discord_id %}
+    <article class="message is-warning">
+      <div class="message-body">
+        Discord アカウントを接続してください。 <a href="{% url "discord_oauth_begin" %}">接続する</a>
+      </div>
+    </article>
+    {% endif %}
 
     <form method="post">
       <input type="hidden" name="action" value="team"/>
@@ -135,8 +141,18 @@
                 {% else %}
                 <p>チームメンバー</p>
                 {% endif %}
-                <button type="button" class="button open-icon is-small">アイコン変更</button>
-                <button type="submit" class="button is-small is-primary">保存</button>
+                <p>
+                  {% if member.discord_id %}
+                    <i class="fa-brands fa-discord"></i> {{ member.discord_username }}
+                  {% else %}
+                    <i class="fa-brands fa-discord" style="color: red;"></i>
+                    <a href="{% url "discord_oauth_begin" %}" class="button is-small">接続する</a>
+                  {% endif %}
+                </p>
+                <section>
+                  <button type="button" class="button open-icon is-small">アイコン変更</button>
+                  <button type="submit" class="button is-small is-primary">保存</button>
+                </section>
               </form>
             {% else %}
               {# 表示のみ #}
@@ -147,6 +163,19 @@
               {% else %}
               <p>チームメンバー</p>
               {% endif %}
+
+              <p>
+                {% if member.discord_id %}
+                  <i class="fa-brands fa-discord"></i> {{ member.discord_username }}
+                {% else %}
+                  <i class="fa-brands fa-discord" style="color: red;"></i>
+                  {% if member.id == user.id %}
+                    <a href="{% url "discord_oauth_begin" %}" class="button is-small">接続する</a>
+                  {% else %}
+                    (未接続)
+                  {% endif %}
+                {% endif %}
+              </p>
             {% endif %}
           </div>
           {% endfor %}
