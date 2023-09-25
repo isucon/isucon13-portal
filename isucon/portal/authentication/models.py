@@ -35,10 +35,22 @@ class User(AbstractUser):
 
     def join_discord(self):
         """Discordサーバへ参加する"""
+        # ユーザー名等の取得
+        r = requests.get("https://discord.com/api/oauth2/@me", headers={
+            "Authorization": "Bearer {}".format(self.discord_access_token),
+        })
+        r.raise_for_status()
+        data = r.json()
+        self.discord_id = data["user"]["id"]
+        self.discord_username = data["user"]["username"]
+
+        join_data = {
+            "access_token": self.discord_access_token,
+        }
         r = requests.put("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
-        }, json={"access_token": self.discord_access_token})
-        print(r.text)
+        }, json=join_data)
+        r.raise_for_status()
 
 
     def update_discord(self):
@@ -55,7 +67,8 @@ class User(AbstractUser):
         r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
         }, json={
-            "nick": "{} ({})".format(self.display_name, self.team.name)
+            "nick": "{} ({})".format(self.display_name, self.team.name),
+            "roles":[settings.DISCORD_USER_ROLE_ID],
         })
         r.raise_for_status()
 
