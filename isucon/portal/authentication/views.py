@@ -216,6 +216,7 @@ def cloudformation_envcheck(request):
     }
 
     context = {
+        "az_id": settings.ENVCHECK_AZ_ID,
         "ami_id": settings.ENVCHECK_AMI_ID,
         "authorized_keys": base64.b64encode(authorized_keys.encode("utf-8")).decode("ascii"),
         "portal_credentials": base64.b64encode(json.dumps(portal_credentials).encode("utf-8")).decode("ascii"),
