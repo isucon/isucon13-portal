@@ -32,6 +32,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.display_name
 
+    @property
+    def authorized_keys(self):
+        url = "https://github.com/{}.keys".format(self.username)
+        resp = requests.get(url)
+        return resp.text
 
     def join_discord(self):
         """Discordサーバへ参加する"""

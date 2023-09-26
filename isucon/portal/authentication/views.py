@@ -3,6 +3,8 @@ import pglock
 import urllib.parse
 import requests
 import datetime
+import base64
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -15,7 +17,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.urls import reverse
 
-from isucon.portal.authentication.models import Team, RegisterCoupon
+from isucon.portal.authentication.models import Team, RegisterCoupon, User
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
 from isucon.portal.authentication.decorators import team_is_authenticated, is_team_modify_available, is_registration_available
 from isucon.portal.authentication.notify import notify_registration
@@ -196,6 +198,32 @@ def decline(request):
     context = {
     }
     return render(request, "team_decline.html", context)
+
+
+@team_is_authenticated
+def cloudformation_envcheck(request):
+    team = request.user.team
+    
+    authorized_keys = []
+    for user in User.objects.filter(team=team):
+        authorized_keys.append(user.authorized_keys)
+    authorized_keys = "\n".join(authorized_keys)
+
+    portal_credentials = {
+        "dev": settings.ENVCHECK_DEVELOP,
+        "token": team.envcheck_token,
+        "host": request.META.get("HTTP_HOST"),
+    }
+
+    context = {
+        "ami_id": settings.ENVCHECK_AMI_ID,
+        "authorized_keys": base64.b64encode(authorized_keys.encode("utf-8")).decode("ascii"),
+        "portal_credentials": base64.b64encode(json.dumps(portal_credentials).encode("utf-8")).decode("ascii"),
+    }
+
+    response = render(request, "cloudformation_envcheck.yaml", context)
+    response['Content-Disposition'] = 'attachment; filename="cloudformation_envcheck.yaml"'
+    return response
 
 
 def team_list(request):
