@@ -1,10 +1,11 @@
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from isucon.portal.authentication.decorators import envcheck_token_required
+from rest_framework.decorators import api_view
 
+from isucon.portal.authentication.decorators import envcheck_token_required
+from isucon.portal.envcheck.serializers import EnvCheckResultSerializer
 
 @envcheck_token_required
 def get_info(request):
@@ -18,6 +19,10 @@ def get_info(request):
 
 @csrf_exempt
 @envcheck_token_required
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def save_result(request):
+    context = {"team": request.team}
+    serializer = EnvCheckResultSerializer(data=request.data, context=context)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
     return HttpResponse(status=204)

@@ -36,7 +36,6 @@ def envcheck_token_required(function):
     @functools.wraps(function)
     def _function(request, *args, **kwargs):
         authorization_header = request.headers.get("Authorization")
-        print(authorization_header)
         try:
             if not authorization_header:
                 raise ValueError()
@@ -44,7 +43,7 @@ def envcheck_token_required(function):
             if method.lower() != "bearer":
                 raise ValueError()
             team = Team.objects.get(envcheck_token=token)
-        except ValueError:
+        except (ValueError, Team.DoesNotExist):
             return HttpResponse(status=401)
 
         request.team = team
