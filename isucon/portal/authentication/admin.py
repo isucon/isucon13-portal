@@ -17,7 +17,7 @@ admin.site.index_title = '管理'
 
 
 class UserAdmin(DjangoUserAdmin):
-    list_display = ["id", "username", "display_name", "team", "discord_username", "is_student", "is_staff"]
+    list_display = ["id", "username", "display_name", "team", "discord_username", "discord_expired_at", "is_student", "is_staff"]
     list_filter = ["is_staff", "is_student", "team"]
     search_fields = ("username", "display_name", "email",)
     readonly_fields = ["username", "icon_tag"]
@@ -43,8 +43,8 @@ admin.site.register(User, UserAdmin)
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "owner", "is_active", "created_at", "declined_at"]
-    list_filter = ["is_active"]
+    list_display = ["id", "name", "owner", "is_guest", "is_active", "created_at", "declined_at"]
+    list_filter = ["is_active", "is_guest"]
     search_fields = ["name"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
