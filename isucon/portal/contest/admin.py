@@ -1,7 +1,4 @@
-import dateutil.parser
-
 from django.contrib import admin
-from django.conf import settings
 from django import forms
 
 from isucon.portal.contest.models import (

@@ -32,6 +32,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.display_name
 
+    @property
+    def authorized_keys(self):
+        url = "https://github.com/{}.keys".format(self.username)
+        resp = requests.get(url)
+        return resp.text
 
     def join_discord(self):
         """Discordサーバへ参加する"""
@@ -75,6 +80,9 @@ class User(AbstractUser):
         self.save()
 
 
+def generate_envcheck_token():
+    return ''.join(random.choice(settings.PASSWORD_LETTERS) for i in range(64))
+
 
 class TeamManager(models.Manager):
     def get_queryset(self):
@@ -97,6 +105,9 @@ class Team(models.Model):
     is_guest = models.BooleanField("ゲストチーム", blank=True, default=False)
 
     # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
+
+    envcheck_token = models.CharField("envcheck向けトークン", max_length=100, default=generate_envcheck_token)
+    envchecked_at = models.DateTimeField("envcheck完了時刻", blank=True, null=True)
 
     objects = TeamManager()
     original_manager = models.Manager()

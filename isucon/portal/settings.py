@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'pglock',
     'isucon.portal',
     'isucon.portal.authentication',
+    'isucon.portal.envcheck',
     # 'isucon.portal.contest',
     # 'isucon.portal.contest.staff',
     # 'isucon.portal.contest.result',
@@ -226,6 +227,11 @@ DISCORD_BOT_ACCESS_TOKEN = "MTE1MTM1Nzc5NzY3MDMzODY0MQ.Gzgj4M.1WndtrZJl7QdoMG_wQ
 DISCORD_USER_ROLE_ID = "1155732748821073930"
 
 BENCHMARK_ABORT_TIMEOUT_SEC = 300
+
+# AWS
+ENVCHECK_AMI_ID = "ami-04a7c0e0153437272"
+ENVCHECK_AZ_ID = "apne1-az1"
+ENVCHECK_DEVELOP = True
 
 # チームに所属できる最大人数
 MAX_TEAM_MEMBER_NUM = 3

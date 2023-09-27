@@ -18,8 +18,9 @@ urlpatterns = [
     path('settings/team/', views.team_settings, name="team_settings"),
     path('settings/icon/', views.update_user_icon, name="update_user_icon"),
     path('settings/decline/', views.decline, name="decline"),
+    path('settings/cloudformation_envcheck.yaml', views.cloudformation_envcheck, name="cloudformation_envcheck"),
     path('discord/begin/', views.discord_oauth_begin, name="discord_oauth_begin"),
-    path('discord/complete/', views.discord_oauth_complete, name="discord_oauth_complete"),
+    path('discord/complete/', views.discord_oauth_complete, name="discord_oauth_complete"),    
 ]
 
 if settings.DEBUG:
