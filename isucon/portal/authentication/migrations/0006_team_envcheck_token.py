@@ -4,6 +4,18 @@ from django.db import migrations, models
 import isucon.portal.authentication.models
 
 
+def forwards_func(apps, schema_editor):
+    Team = apps.get_model("authentication", "Team")
+    db_alias = schema_editor.connection.alias
+    for team in Team.objects.using(db_alias).all():
+        team.envcheck_token = isucon.portal.authentication.models.generate_envcheck_token()
+        team.save(update_fields=("envcheck_token",))
+
+
+def reverse_func(apps, schema_editor):
+    return
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,4 +28,5 @@ class Migration(migrations.Migration):
             name='envcheck_token',
             field=models.CharField(default=isucon.portal.authentication.models.generate_envcheck_token, max_length=100, verbose_name='envcheck向けトークン'),
         ),
+        migrations.RunPython(forwards_func, reverse_func)
     ]

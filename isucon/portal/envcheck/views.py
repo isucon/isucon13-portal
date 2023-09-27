@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.utils import timezone
 
 from rest_framework.decorators import api_view
 
@@ -24,5 +25,8 @@ def save_result(request):
     context = {"team": request.team}
     serializer = EnvCheckResultSerializer(data=request.data, context=context)
     serializer.is_valid(raise_exception=True)
-    serializer.save()
+    result = serializer.save()
+    if result.passed:
+        request.team.envchecked_at = timezone.now()
+        request.team.save(update_fields=("envchecked_at", ))
     return HttpResponse(status=204)
