@@ -56,9 +56,13 @@ class User(AbstractUser):
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
         }, json=join_data)
         r.raise_for_status()
+        self.save()
 
 
     def update_discord(self):
+        if self.is_staff:
+            return
+
         # ユーザー名等の取得
         r = requests.get("https://discord.com/api/oauth2/@me", headers={
             "Authorization": "Bearer {}".format(self.discord_access_token),
