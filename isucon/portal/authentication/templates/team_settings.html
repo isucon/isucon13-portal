@@ -24,8 +24,60 @@
       </article>
     {% endif %}
 
-    {% if not user.discord_id %}
+    {% if not discord_is_connected %}
     <article class="message is-warning">
+      <div class="message-body">
+        Discord アカウントが接続されていないメンバーがいます。
+      </div>
+    </article>
+    {% else %}
+    <article class="message is-info">
+      <div class="message-body">
+        全てのメンバーのDiscord アカウントが接続されています。
+      </div>
+    </article>
+    {% endif %}
+
+    {% if not checnenv_is_done %}
+    <article class="message is-danger">
+      <div class="message-body content">
+        <p>
+          AWS環境チェックが完了していません。下のボタンから CloudFormation のテンプレートをダウンロードしデプロイしてください。
+          <ul>
+            <li>テンプレートダウンロード前にGitHubアカウントにSSH公開鍵を登録しておく必要があります</li>
+            <li>CloudFormationによるデプロイ後に起動するEC2のインスタンスに isucon ユーザーでSSHによりログインをする必要があります (例: <code>ssh isucon@203.0.113.14</code>)</li>
+            <li>インスタンスに割り当てられたグローバルIPアドレス (EIP) をAWSのコンソールにて確認してからSSHによるログインをしてください</li>
+            <li>SSHによるログイン時に「全てのチェックをパスしました」とコンソール出力されれば成功です</li>
+            <li>環境チェック後はスタックを削除してください</li>
+          </ul>
+        </p>
+        <p>
+          <a href="{% url "cloudformation_envcheck" %}">
+            <button class="button is-info is-small">AWS環境チェック CloudFormation テンプレート</button>
+          </a>
+        </p>
+      </div>
+    </article>
+    {% else %}
+    <article class="message is-info">
+      <div class="message-body content">
+        <p>
+          AWS環境チェックが完了しています。
+          <ul>
+            <li>環境チェック後はスタックを削除してください</li>
+          </ul>
+        </p>
+        <p>
+          <a href="{% url "cloudformation_envcheck" %}">
+            <button class="button is-info is-small">AWS環境チェック CloudFormation テンプレート</button>
+          </a>
+        </p>
+      </div>
+    </article>
+    {% endif %}
+
+    {% if not user.discord_id %}
+    <article class="message is-danger">
       <div class="message-body">
         Discord アカウントを接続してください。 <a href="{% url "discord_oauth_begin" %}">接続する</a>
       </div>

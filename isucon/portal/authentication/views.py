@@ -152,9 +152,17 @@ def team_settings(request):
             messages.success(request, "ユーザー情報を更新しました")
             return redirect("team_settings")
 
+    # 環境チェック済み
+    checnenv_is_done = True if request.user.team.envchecked_at else False
+
+    # Discord登録済み (チーム全員)
+    discord_is_connected = False if User.objects.filter(team=request.user.team, discord_id="").exists() else True
+
     context = {
         "form": form,
         "user_form": user_form,
+        "checnenv_is_done": checnenv_is_done,
+        "discord_is_connected": discord_is_connected,
         "team_members": request.user.team.user_set.all()
     }
     return render(request, "team_settings.html", context)
