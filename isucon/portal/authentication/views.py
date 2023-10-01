@@ -289,7 +289,6 @@ def discord_oauth_complete(request):
     r = requests.post("https://discord.com/api/oauth2/token", data=data, headers=headers)
     r.raise_for_status()
     data = r.json()
-    print(data)
 
     request.user.discord_access_token = data["access_token"]
     request.user.discord_refresh_token = data["refresh_token"]

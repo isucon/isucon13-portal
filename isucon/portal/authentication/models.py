@@ -58,6 +58,24 @@ class User(AbstractUser):
         r.raise_for_status()
         self.save()
 
+    def refresh_discord_token(self):
+        data = {
+            'client_id': settings.DISCORD_OAUTH_CLIENT_ID,
+            'client_secret': settings.DISCORD_OAUTH_CLIENT_SECRET,
+            'grant_type': 'refresh_token',
+            'refresh_token': self.discord_refresh_token,
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        r = requests.post("https://discord.com/api/oauth2/token", data=data, headers=headers)
+        r.raise_for_status()
+        data = r.json()
+
+        self.discord_access_token = data["access_token"]
+        self.discord_refresh_token = data["refresh_token"]
+        self.discord_expired_at = timezone.now() + datetime.timedelta(seconds=data["expires_in"])
+        self.save()
 
     def update_discord(self):
         if self.is_staff:
