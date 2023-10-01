@@ -11,6 +11,11 @@ function start_api () {
     gunicorn --bind 0.0.0.0:8000 -w 3 --max-requests 3000 --max-requests-jitter 500 isucon.portal.wsgi:application --capture-output --error-logfile -
 }
 
+function updatediscord () {
+    python3 manage.py updatediscord
+}
+
 case "${TASK}" in
   "api" ) start_api ;;
+  "updatediscord" ) updatediscord ;;
 esac
