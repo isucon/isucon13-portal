@@ -90,11 +90,13 @@ class User(AbstractUser):
         self.discord_id = data["user"]["id"]
         self.discord_username = data["user"]["username"]
 
+
         # ニックネーム等を設定
+        nick = "{} ({})".format(self.display_name, self.team.name)
         r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
         }, json={
-            "nick": "{} ({})".format(self.display_name, self.team.name),
+            "nick": nick[:31],
             "roles":[settings.DISCORD_USER_ROLE_ID],
         })
         r.raise_for_status()
