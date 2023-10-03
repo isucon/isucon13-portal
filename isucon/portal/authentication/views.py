@@ -5,6 +5,7 @@ import requests
 import datetime
 import base64
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -26,6 +27,7 @@ from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
 class LoginView(DjangoLoginView):
     pass
 
+logger = logging.getLogger(__name__)
 
 @login_required
 def register(request):
@@ -142,13 +144,24 @@ def team_settings(request):
         form = TeamForm(request.POST, instance=request.user.team)
         if form.is_valid():
             form.save()
+            for user in User.objects.filter(team=request.user.team):
+                if user.discord_access_token:
+                    try:
+                        request.user.update_discord()
+                    except:
+                        logger.exception("update_discord error")
             messages.success(request, "チーム情報を更新しました")
             return redirect("team_settings")
 
     if request.method == "POST" and request.POST.get("action") == "user":
         user_form = UserForm(request.POST, instance=request.user)
         if user_form.is_valid():
-            user_form.save()
+            user = user_form.save()
+            if user.discord_access_token:
+                try:
+                    user.update_discord()
+                except:
+                    logger.exception("update_discord error")
             messages.success(request, "ユーザー情報を更新しました")
             return redirect("team_settings")
 
@@ -302,7 +315,11 @@ def discord_oauth_complete(request):
     request.user.discord_refresh_token = data["refresh_token"]
     request.user.discord_expired_at = timezone.now() + datetime.timedelta(seconds=data["expires_in"])
     request.user.join_discord()
-    request.user.update_discord()
+
+    try:
+        request.user.update_discord()
+    except:
+        logger.exception("update_discord error")
 
     messages.success(request, "Discordアカウントを接続しました")
 
