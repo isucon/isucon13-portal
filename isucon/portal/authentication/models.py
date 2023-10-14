@@ -92,12 +92,16 @@ class User(AbstractUser):
 
 
         # ニックネーム等を設定
+        roles = [settings.DISCORD_USER_ROLE_ID]
+        if not self.team or not self.team.is_active:
+            roles = []
+
         nick = "{} ({})".format(self.display_name, self.team.name)
         r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
         }, json={
             "nick": nick[:31],
-            "roles":[settings.DISCORD_USER_ROLE_ID],
+            "roles": roles,
         })
         r.raise_for_status()
 
@@ -120,6 +124,7 @@ class Team(models.Model):
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("最終更新日時", auto_now=True)
     declined_at = models.DateTimeField("辞退日時", blank=True, null=True)
+    banned_at = models.DateTimeField("失格日時", blank=True, null=True)
 
     owner = models.OneToOneField(User, verbose_name="オーナー", on_delete=models.PROTECT, related_name="+")
     is_active = models.BooleanField("有効", default=True, blank=True)
@@ -166,6 +171,16 @@ class Team(models.Model):
         self.is_active = False
         self.save()
         User.objects.filter(team=self).update(team=None)
+
+    def ban(self):
+        # 失格処理
+        if self.banned_at:
+            # すでに処理済み
+            return
+
+        self.banned_at = timezone.now()
+        self.is_active = False
+        self.save()
 
     @property
     def score(self):
