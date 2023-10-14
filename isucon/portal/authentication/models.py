@@ -96,7 +96,10 @@ class User(AbstractUser):
         if not self.team or not self.team.is_active:
             roles = []
 
-        nick = "{} ({})".format(self.display_name, self.team.name)
+        if self.team:
+            nick = "{} ({})".format(self.display_name, self.team.name)
+        else:
+            nick = self.display_name
         r = requests.patch("https://discord.com/api/guilds/{}/members/{}".format(settings.DISCORD_SERVER_ID, self.discord_id), headers={
             "Authorization": "Bot {}".format(settings.DISCORD_BOT_ACCESS_TOKEN),
         }, json={
