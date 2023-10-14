@@ -1,6 +1,6 @@
 import functools
 
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -8,10 +8,21 @@ from django.http import HttpResponse
 
 from isucon.portal.authentication.models import Team
 
-def has_team(user):
-    return user.is_authenticated and user.team is not None
 
-team_is_authenticated = user_passes_test(has_team)
+def team_is_authenticated(function):
+    @functools.wraps(function)
+    def _function(request, *args, **kwargs):
+        user = request.user
+        if user.team is None:
+            return redirect("index")
+        if user.team.banned_at:
+            return HttpResponse("必要な対応が指定日時までに完了していなかったため参加がキャンセルされました", status=403)
+        if not user.team.is_active:
+            return HttpResponse("このチームは無効です", status=403)
+        return function(request, *args, **kwargs)
+
+    return login_required(_function)
+
 
 def is_registration_available():
     """登録可能か日時チェック"""
