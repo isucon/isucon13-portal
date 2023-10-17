@@ -1,5 +1,6 @@
 import datetime
 import logging
+import time
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -13,9 +14,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("=== Refresh Token ===")
         l = timezone.now()+datetime.timedelta(days=5)
-        for user in User.objects.filter(discord_expired_at__lte=l):
+        for user in User.objects.filter(discord_expired_at__lte=l).order_by("discord_expired_at"):
             print(user)
-            user.refresh_discord_token()
+            try:
+                user.refresh_discord_token()
+            except:
+                logger.exception("refresh_discord_token error")
+            time.sleep(0.5)
 
         print("=== Update Information ===")
         for user in User.objects.filter(discord_expired_at__isnull=False):
@@ -24,3 +29,4 @@ class Command(BaseCommand):
                 user.update_discord()
             except:
                 logger.exception("update_discord error")
+            time.sleep(0.5)
