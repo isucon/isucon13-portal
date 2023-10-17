@@ -10,7 +10,7 @@ REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 10, 17, 18, 0, 0)
 REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 10, 20, 22, 00, 0)
 
 # 最大チーム数
-MAX_TEAM_NUM = 220 + 200 + 200
+MAX_TEAM_NUM = 636
 
 # Discord
 DISCORD_APPLICATION_ID = os.environ.get("DISCORD_APPLICATION_ID", "")
