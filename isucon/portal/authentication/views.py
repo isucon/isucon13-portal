@@ -222,6 +222,24 @@ def decline(request):
 
 
 @team_is_authenticated
+def cloud_coupon(request):
+    team = request.user.team
+    context = {
+    }
+    if request.method == "POST" and request.POST.get("action") == "agree":
+        coupon = {
+            "sacloud": team.sacloud_coupon,
+            "aws": team.aws_coupon,
+        }
+        if not team.coupon_agreed_at:
+            team.coupon_agreed_at = timezone.now()
+            team.save()
+        context["coupon"] = coupon
+        
+    return render(request, "cloud_coupon.html", context)
+
+
+@team_is_authenticated
 def cloudformation_envcheck(request):
     team = request.user.team
     

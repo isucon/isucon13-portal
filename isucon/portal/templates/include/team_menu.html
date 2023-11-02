@@ -41,6 +41,12 @@
             </span>
             <span>Team Settings</span>
         </a>
+        <a class="{% if page == "cloud_coupon" %}active{% endif %}" href="{% url "cloud_coupon" %}">
+            <span class="icon">
+                <i class="fas fa-cloud"></i>
+            </span>
+            <span>Cloud Coupon</span>
+        </a>
     </li>
     {% if is_now_on_contest %}
     <li>
