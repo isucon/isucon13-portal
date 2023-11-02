@@ -224,6 +224,9 @@ def decline(request):
 @team_is_authenticated
 def cloud_coupon(request):
     team = request.user.team
+    if not team.aws_coupon:
+        return render(request, "cloud_coupon_none.html")
+
     context = {
     }
     if request.method == "POST" and request.POST.get("action") == "agree":
