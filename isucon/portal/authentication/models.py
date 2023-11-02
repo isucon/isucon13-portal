@@ -141,6 +141,11 @@ class Team(models.Model):
     envcheck_token = models.CharField("envcheck向けトークン", max_length=100, default=generate_envcheck_token)
     envchecked_at = models.DateTimeField("envcheck完了時刻", blank=True, null=True)
 
+    # Cloud Coupon
+    coupon_agreed_at = models.DateTimeField("クーポン同意日時", blank=True, null=True)
+    sacloud_coupon = models.CharField("さくらのクラウドクーポン", max_length=50, blank=True)
+    aws_coupon = models.CharField("AWSクーポン", max_length=50, blank=True)
+
     objects = TeamManager()
     original_manager = models.Manager()
 
