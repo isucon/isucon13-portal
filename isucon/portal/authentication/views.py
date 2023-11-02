@@ -22,7 +22,7 @@ from isucon.portal.authentication.models import Team, RegisterCoupon, User
 from isucon.portal.authentication.forms import TeamRegisterForm, JoinToTeamForm
 from isucon.portal.authentication.decorators import team_is_authenticated, is_team_modify_available, is_registration_available
 from isucon.portal.authentication.notify import notify_registration
-from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm
+from isucon.portal.authentication.forms import TeamForm, UserForm, UserIconForm, LocalParticipationForm
 
 class LoginView(DjangoLoginView):
     pass
@@ -219,6 +219,27 @@ def decline(request):
     context = {
     }
     return render(request, "team_decline.html", context)
+
+
+@team_is_authenticated
+def local_participation(request):
+    """現地参加希望登録"""
+    team = request.user.team
+    form = LocalParticipationForm(instance=team)
+    if request.method == "POST":
+        form = LocalParticipationForm(instance=team, data=request.POST)
+        if form.is_valid():
+            team = form.save()
+            message = "現地参加を 「{}」 で保存しました".format(
+                "希望する" if team.want_local_participation else "希望しない"
+            )
+            messages.info(request, message)
+            return redirect("team_settings")
+
+    context = {
+        "form": form,
+    }
+    return render(request, "local_participation.html", context)
 
 
 @team_is_authenticated

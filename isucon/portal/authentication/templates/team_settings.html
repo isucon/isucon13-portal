@@ -38,6 +38,17 @@
     </article>
     {% endif %}
 
+    <article class="message is-warning">
+      <div class="message-body">
+        現地参加の希望は
+        {% if user.team.want_local_participation %}「希望する」{% else %}「希望しない」{% endif %}
+        で登録されています。
+        <br>
+        変更を希望する場合は <a href="{% url "local_participation" %}">こちらから</a> 変更してください。
+      </div>
+    </article>
+
+
     {% if not checnenv_is_done %}
     <article class="message is-danger">
       <div class="message-body content">
