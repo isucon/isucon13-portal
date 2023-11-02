@@ -1,0 +1,80 @@
+{% extends "include/layout.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="column is-9">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="/">ISUCON13</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Local Participation</a></li>
+        </ul>
+    </nav>
+
+
+    {% if not user.discord_id %}
+    <article class="message is-danger">
+      <div class="message-body">
+        Discord アカウントを接続してください。 <a href="{% url "discord_oauth_begin" %}">接続する</a>
+      </div>
+    </article>
+    {% endif %}
+
+    <form method="post">
+      <input type="hidden" name="action" value="team"/>
+      {% csrf_token %}
+
+      <section class="section">
+        <h1 class="title">現地参加希望登録</h1>
+        <div class="box">
+            
+          {% if form.errors %}
+          <div class="message is-danger">
+              <div class="message-header">
+                {% for error in form.errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              <div class="message-body">
+                  <strong>入力内容にエラーがあります</strong><br>
+                  {{ form.errors }}
+              </div>
+          </div>
+          {% endif %}
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">チーム名</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input class="input is-static" value="{{ user.team.name }}" readonly>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">現地参加を希望する</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  {{ form.want_local_participation }}
+                </p>
+                <p class="help">現地参加を希望する場合にはチェックをつけて保存してください</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="button is-primary">保存</button>
+
+        </div>
+      </section>
+
+    </form>
+
+</div>
+
+
+{% endblock %}

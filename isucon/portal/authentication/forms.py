@@ -231,6 +231,12 @@ class TeamForm(forms.ModelForm):
         return name
 
 
+class LocalParticipationForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ("want_local_participation", )
+
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
