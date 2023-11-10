@@ -19,7 +19,7 @@ class Command(BaseCommand):
             try:
                 user.refresh_discord_token()
             except:
-                logger.exception("refresh_discord_token error")
+                logger.warning("refresh_discord_token error")
             time.sleep(0.5)
 
         print("=== Update Information ===")
@@ -28,5 +28,5 @@ class Command(BaseCommand):
             try:
                 user.update_discord()
             except:
-                logger.exception("update_discord error")
+                logger.warning("update_discord error")
             time.sleep(0.5)
