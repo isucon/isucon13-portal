@@ -138,8 +138,6 @@ class Team(models.Model):
 
     want_local_participation = models.BooleanField("現地参加を希望する", blank=True)
 
-    # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
-
     envcheck_token = models.CharField("envcheck向けトークン", max_length=100, default=generate_envcheck_token)
     envchecked_at = models.DateTimeField("envcheck完了時刻", blank=True, null=True)
 

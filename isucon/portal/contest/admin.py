@@ -4,7 +4,6 @@ from django import forms
 from isucon.portal.contest.models import (
     Server,
     Information,
-    Benchmarker,
     Score,
     Job
 )
@@ -32,13 +31,6 @@ class InformationAdmin(admin.ModelAdmin):
 admin.site.register(Information, InformationAdmin)
 
 
-class BenchmarkerAdmin(admin.ModelAdmin):
-    list_display = ["id", "ip"]
-    list_filter = ["ip"]
-
-admin.site.register(Benchmarker, BenchmarkerAdmin)
-
-
 class ScoreAdmin(admin.ModelAdmin):
     list_display = ["id", "team", "best_score", "latest_score", "latest_is_passed"]
     list_filter = ["latest_is_passed"]
@@ -46,7 +38,7 @@ class ScoreAdmin(admin.ModelAdmin):
 admin.site.register(Score, ScoreAdmin)
 
 class JobAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "status", "target", "benchmarker", "is_passed", "score", "reason_short"]
+    list_display = ["id", "team", "status", "target", "is_passed", "score", "reason_short"]
     list_filter = ["status", "is_passed", "team"]
 
     def reason_short(self, instance):

@@ -25,13 +25,6 @@ class InformationFactory(factory.DjangoModelFactory):
     is_enabled = True
 
 
-class BenchmarkerFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = models.Benchmarker
-
-    ip = factory.Sequence(lambda idx: random_ip(idx))
-
-
 class ServerFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Server

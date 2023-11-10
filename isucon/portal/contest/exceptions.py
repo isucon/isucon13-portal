@@ -16,10 +16,6 @@ class TeamBenchTargetTooManyError(Exception):
     """チームのベンチマーク対象が複数存在してしまっている際に発生する例外"""
     pass
 
-class TeamBenchmarkerDoesNotExistError(Exception):
-    """チームのベンチマーカーが見つからない場合に発生する例外"""
-    pass
-
 class JobDoesNotExistError(Exception):
     """指定されたjob_idのジョブが見つからない際に発生する例外"""
     pass

@@ -1,5 +1,3 @@
-import datetime
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.conf import settings
@@ -12,9 +10,8 @@ from isucon.portal.authentication.decorators import team_is_authenticated
 from isucon.portal.authentication.models import Team
 from isucon.portal.contest.decorators import team_is_now_on_contest
 from isucon.portal.contest.models import Server, Job, Score
-from isucon.portal.contest.exceptions import TeamScoreDoesNotExistError
 
-from isucon.portal.contest.forms import TeamForm, UserForm, ServerTargetForm, UserIconForm, ServerAddForm
+from isucon.portal.contest.forms import ServerTargetForm, ServerAddForm
 from isucon.portal.contest.redis.client import RedisClient
 
 
@@ -40,7 +37,7 @@ def dashboard(request):
     context = get_base_context(request.user)
 
     recent_jobs = Job.objects.of_team(team=request.user.team).order_by("-created_at")[:10]
-    top_teams = Score.objects.passed().filter(team__participate_at=request.user.team.participate_at).select_related("team")[:30]
+    top_teams = Score.objects.passed().select_related("team")[:30]
 
     # チームのスコアを取得
     try:
@@ -121,8 +118,8 @@ def scores(request):
     context = get_base_context(request.user)
 
     context.update({
-        "passed": Score.objects.passed().filter(team__participate_at=request.user.team.participate_at).select_related("team"),
-        "failed": Score.objects.failed().filter(team__participate_at=request.user.team.participate_at).select_related("team"),
+        "passed": Score.objects.passed().select_related("team"),
+        "failed": Score.objects.failed().select_related("team"),
     })
 
     return render(request, "scores.html", context)
@@ -189,7 +186,7 @@ def delete_server(request, pk):
 @team_is_now_on_contest
 def teams(request):
 
-    teams = Team.objects.filter(participate_at=request.user.team.participate_at).order_by('id').all()
+    teams = Team.objects.order_by('id').all()
 
     paginator = Paginator(teams, 100)
 
@@ -217,7 +214,7 @@ def graph(request):
     team = request.user.team
 
     ranking = [row["team__id"] for row in
-                    Score.objects.passed().filter(team__participate_at=team.participate_at).values("team__id")[:settings.RANKING_TOPN]]
+                    Score.objects.passed().values("team__id")[:settings.RANKING_TOPN]]
 
     client = RedisClient()
     graph_datasets, graph_min, graph_max = client.get_graph_data(team, ranking, is_last_spurt=context['is_last_spurt'])
