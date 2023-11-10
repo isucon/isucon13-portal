@@ -15,7 +15,12 @@ function updatediscord () {
     python3 manage.py updatediscord
 }
 
+function management_command () {
+    python manage.py $@
+}
+
 case "${TASK}" in
   "api" ) start_api ;;
   "updatediscord" ) updatediscord ;;
+  * ) management_command $@
 esac
