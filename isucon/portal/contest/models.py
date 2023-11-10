@@ -205,19 +205,6 @@ class Job(models.Model):
         )
         print(response)
 
-    def done(self, score, is_passed, stdout, stderr, reason, status=DONE):
-        # ベンチマークが終了したらログを書き込む
-        self.stdout = stdout
-        self.stderr = stderr
-
-        self.score = score
-        self.is_passed = is_passed
-        self.status = status
-
-        self.reason = reason
-        self.finished_at = timezone.now()
-        self.save()
-
     def abort(self, reason, stdout, stderr):
         self.status = Job.ABORTED
         self.reason = reason
