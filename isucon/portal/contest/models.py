@@ -1,24 +1,20 @@
 import datetime
 import json
+import boto3
 
 from django.db import models
-from django.db.models import Max, Sum
 from django.forms.models import model_to_dict
 from django.utils import timezone
 
 from isucon.portal import settings
-from isucon.portal.models import LogicalDeleteMixin, CommaSeparatedDateField
+from isucon.portal.models import LogicalDeleteMixin
 from isucon.portal.contest import exceptions
 
-# FIXME: ベンチマーク対象のサーバを変更する機能
-# https://github.com/isucon/isucon8-final/blob/d1480128c917f3fe4d87cb84c83fa2a34ca58d39/portal/lib/ISUCON13/Portal/Web/Controller/API.pm#L32
 
 class InformatioManager(models.Manager):
 
     def of_team(self, team):
         return self.get_queryset().filter(is_enabled=True)
-
-
 
 class Information(LogicalDeleteMixin, models.Model):
     class Meta:
@@ -30,17 +26,6 @@ class Information(LogicalDeleteMixin, models.Model):
     is_enabled = models.BooleanField("表示", blank=True)
 
     objects = InformatioManager()
-
-class Benchmarker(LogicalDeleteMixin, models.Model):
-    class Meta:
-        verbose_name = verbose_name_plural = "ベンチマーカー"
-
-    # TODO: ベンチマーカーを管理する上で必要な情報を追加
-    ip = models.CharField("ベンチマーカーのIPアドレス", max_length=100)
-
-    def __str__(self):
-        return self.ip
-
 
 class ServerManager(models.Manager):
 
@@ -105,28 +90,12 @@ class JobManager(models.Manager):
 
         # 追加
         job = self.model(team=team)
-        job.save(using=self._db)
-
-        return job
-
-    def dequeue(self, benchmarker=None):
-        if benchmarker is not None:
-            # ベンチマーカーが自身にひもづくチームのサーバにベンチマークを行う場合
-            # 報告したベンチマーカの紐づいているチーム、かつWAITING状態のジョブを取得
-            queryset = self.get_queryset().select_for_update().filter(status=Job.WAITING, team__benchmarker=benchmarker)
-        else:
-            # ベンチマーカーが割り当てられてないチームのベンチマークを行う場合
-            queryset = self.get_queryset().select_for_update().filter(status=Job.WAITING, team__benchmarker__isnull=True)
-
-        job = queryset.order_by("created_at").first()
-        if job is None:
-            raise exceptions.JobDoesNotExistError
-
-        # 状態を処理中にする
-        job.status = Job.RUNNING
-        job.target = Server.objects.get(team=job.team, is_bench_target=True)
+        job.target = Server.objects.get_bench_target(team)
         job.target_ip = job.target.global_ip
         job.save(using=self._db)
+
+        # SQSに送信
+        job.send_to_queue()
 
         return job
 
@@ -174,7 +143,6 @@ class Job(models.Model):
     team = models.ForeignKey('authentication.Team', verbose_name="チーム", on_delete=models.CASCADE)
     target = models.ForeignKey('Server', verbose_name="対象サーバ", blank=True, null=True, on_delete=models.SET_NULL)
     target_ip = models.CharField("対象サーバIPアドレス", blank=True, max_length=100)
-    benchmarker = models.ForeignKey('Benchmarker', verbose_name="ベンチマーカ", blank=True, null=True, on_delete=models.SET_NULL)
 
     # Choice系
     status = models.CharField("進捗", max_length=100, choices=STATUS_CHOICES, default=WAITING)
@@ -221,19 +189,21 @@ class Job(models.Model):
         except:
             pass
         return {}
-
-    def done(self, score, is_passed, stdout, stderr, reason, status=DONE):
-        # ベンチマークが終了したらログを書き込む
-        self.stdout = stdout
-        self.stderr = stderr
-
-        self.score = score
-        self.is_passed = is_passed
-        self.status = status
-
-        self.reason = reason
-        self.finished_at = timezone.now()
-        self.save()
+    
+    def send_to_queue(self):
+        data = {
+            "id": self.id,
+            "team": self.team_id,
+            "target_ip": self.target_ip,
+        }
+        sqs_client = boto3.client("sqs")
+        response = sqs_client.send_message(
+            QueueUrl=settings.SQS_JOB_URL,
+            MessageBody=json.dumps(data),
+            MessageGroupId="job",
+            MessageDeduplicationId=str(self.id),
+        )
+        print(response)
 
     def abort(self, reason, stdout, stderr):
         self.status = Job.ABORTED
@@ -253,7 +223,7 @@ class ScoreManager(models.Manager):
         return self.get_queryset().filter(latest_is_passed=False)
 
 
-# NOTE: Scoreは、Django signals を用いることで、チーム登録時に作成され、得点履歴が追加されるごとに更新されます
+# NOTE: Scoreは、チーム毎に作成され、Django signals を用いることで、得点履歴が追加されるごとに更新されます
 class Score(LogicalDeleteMixin, models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チームスコア"

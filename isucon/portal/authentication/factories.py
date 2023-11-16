@@ -23,8 +23,6 @@ class TeamFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Team
 
-    benchmarker = factory.SubFactory(contest_factories.BenchmarkerFactory)
-
     name = factory.Sequence(lambda idx: "team{}".format(idx))
     password = factory.Sequence(lambda idx: make_password("password{}".format(idx)))
 

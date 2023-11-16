@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'isucon.portal',
     'isucon.portal.authentication',
     'isucon.portal.envcheck',
-    # 'isucon.portal.contest',
+    'isucon.portal.contest',
     # 'isucon.portal.contest.staff',
     # 'isucon.portal.contest.result',
 ]
@@ -193,6 +193,9 @@ DEFAULT_FILE_STORAGE = "isucon.storage_backends.MediaStorage"
 AWS_ACCESS_KEY_ID = "AKIAWFVKEZX5PTZOKL36"
 AWS_SECRET_ACCESS_KEY = "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"
 AWS_STORAGE_BUCKET_NAME = "isucon13-portal-dev"
+
+SQS_JOB_URL = "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue.fifo"
+SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-result"
 
 
 # 登録期間

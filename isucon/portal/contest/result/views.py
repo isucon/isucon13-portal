@@ -34,12 +34,12 @@ def dashboard(request):
     except ValueError:
         top_n = settings.RANKING_TOPN
 
-    top_teams = Score.objects.passed().filter(team__participate_at=participate_at)[:30]
+    top_teams = Score.objects.passed()[:30]
 
     """
     # topN チームID配列を用意
     ranking = [row["team__id"] for row in
-                Score.objects.passed().filter(team__participate_at=participate_at).values("team__id")[:top_n]]
+                Score.objects.passed().values("team__id")[:top_n]]
 
     if request.user.team.id not in top_teams:
         ranking.append(request.user.team.id)

@@ -17,7 +17,7 @@ class TimeTest(TestCase):
         """ is_playing() 時刻チェックのテスト"""
         # チームを作成 (日付一致前提)
         now = datetime.datetime.now()
-        team = auth_factories.TeamFactory(owner=self.owner, participate_at=now.date())
+        team = auth_factories.TeamFactory(owner=self.owner)
 
         # 開催期間内の場合 True
         settings.CONTEST_START_TIME = portal_utils.get_utc_time(now.hour-1, 0, 0)

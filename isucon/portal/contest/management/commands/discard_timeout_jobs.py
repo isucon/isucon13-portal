@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from isucon.portal.contest.models import Job
 
 
-logger = logging.getLogger("discard_forever")
+logger = logging.getLogger("discard_timeout_job")
 
 
 class Command(BaseCommand):
