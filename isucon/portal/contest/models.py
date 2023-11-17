@@ -195,6 +195,7 @@ class Job(models.Model):
             "id": self.id,
             "team": self.team_id,
             "target_ip": self.target_ip,
+            "servers":[s.global_ip for s in Server.objects.of_team(self.team)],
         }
         sqs_client = boto3.client("sqs")
         response = sqs_client.send_message(
