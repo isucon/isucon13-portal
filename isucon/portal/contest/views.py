@@ -1,13 +1,16 @@
+import base64
+import json
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponseNotAllowed, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 
 from isucon.portal import utils as portal_utils
 from isucon.portal.authentication.decorators import team_is_authenticated
-from isucon.portal.authentication.models import Team
+from isucon.portal.authentication.models import Team, User
 from isucon.portal.contest.decorators import team_is_now_on_contest
 from isucon.portal.contest.models import Server, Job, Score
 
@@ -156,30 +159,32 @@ def servers(request):
     })
     return render(request, "servers.html", context)
 
-
 @team_is_authenticated
 @team_is_now_on_contest
-def delete_server(request, pk):
-    if request.method != "DELETE":
-        return HttpResponseNotAllowed(["DELETE"])
+def cloudformation_contest(request):
+    team = request.user.team
 
-    server = get_object_or_404(Server.objects.of_team(request.user.team), pk=pk)
+    authorized_keys = []
+    for user in User.objects.filter(team=team):
+        authorized_keys.append(user.authorized_keys)
+    authorized_keys = "\n".join(authorized_keys)
 
-    if server.is_bench_target:
-        messages.warning(request, "ベンチマーク対象のサーバは削除できません")
-        if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return HttpResponse("Error")
-        return redirect("servers")
+    portal_credentials = {
+        "dev": False,
+        "token": team.envcheck_token,
+        "host": request.META.get("HTTP_HOST"),
+    }
 
-    server.delete()
+    context = {
+        "az_id": settings.CONTEST_AZ_ID,
+        "ami_id": settings.CONTEST_AMI_ID,
+        "authorized_keys": base64.b64encode(authorized_keys.encode("utf-8")).decode("ascii"),
+        "portal_credentials": base64.b64encode(json.dumps(portal_credentials).encode("utf-8")).decode("ascii"),
+    }
 
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse(
-            {}, status = 200
-        )
-
-    messages.success(request, "サーバを削除しました")
-    return redirect("servers")
+    response = render(request, "cloudformation_contest.yaml", context)
+    response['Content-Disposition'] = 'attachment; filename="cloudformation_contest.yaml"'
+    return response
 
 
 @team_is_authenticated
