@@ -103,7 +103,7 @@ class JobManager(models.Manager):
         # FIXME: Celeryタスクで定期的に実行させる
 
         # タイムアウトの締め切り
-        deadline = timezone.now() - datetime.timedelta(seconds=timeout_sec)
+        deadline = timezone.now() + datetime.timedelta(seconds=timeout_sec)
 
         # タイムアウトした(=締め切りより更新時刻が古い) ジョブを aborted にしていく
         jobs = Job.objects.filter(status=Job.RUNNING, updated_at__lt=deadline)
