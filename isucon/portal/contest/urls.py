@@ -10,7 +10,7 @@ urlpatterns = [
     path('jobs/enqueue/', views.job_enqueue, name="job_enqueue"),
     path('jobs/<int:pk>/', views.job_detail, name="job_detail"),
     path('scores/', views.scores, name="scores"),
-    # path('servers/', views.servers, name="servers"),
+    path('servers/', views.servers, name="servers"),
     # path('graph/', views.graph, name="graph"),
     # path('teams/', views.teams, name="teams"),
     # path('staff/', include("isucon.portal.contest.staff.urls")),

@@ -132,7 +132,6 @@ def scores(request):
 def servers(request):
     context = get_base_context(request.user)
     servers = Server.objects.of_team(request.user.team)
-    add_form = ServerAddForm(team=request.user.team)
 
     if request.method == "POST":
         action = request.POST.get("action", "").lower()
@@ -146,16 +145,8 @@ def servers(request):
                 messages.success(request, "ベンチマーク対象のサーバを変更しました")
                 return redirect("servers")
 
-        if action == "add":
-            add_form = ServerAddForm(request.POST, team=request.user.team)
-            if add_form.is_valid():
-                add_form.save()
-                messages.success(request, "サーバを追加しました")
-                return redirect("servers")
-
     context.update({
         "servers": servers,
-        "add_form": add_form
     })
     return render(request, "servers.html", context)
 
