@@ -1,5 +1,6 @@
 import base64
 import json
+import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
@@ -13,10 +14,10 @@ from isucon.portal.authentication.decorators import team_is_authenticated
 from isucon.portal.authentication.models import Team, User
 from isucon.portal.contest.decorators import team_is_now_on_contest
 from isucon.portal.contest.models import Server, Job, Score
+from isucon.portal.contest.redis.color import iter_colors
+from isucon.portal.contest.redis.client import TeamGraphData
 
-from isucon.portal.contest.forms import ServerTargetForm, ServerAddForm
-from isucon.portal.contest.redis.client import RedisClient
-
+from isucon.portal.contest.forms import ServerTargetForm
 
 def get_base_context(user):
     try:
@@ -200,28 +201,51 @@ def teams(request):
     return render(request, "teams.html", context)
 
 
-@team_is_authenticated
-@team_is_now_on_contest
+
+def get_graph_data():
+    color_iterator = iter_colors()
+    datasets = []
+
+    # NOTE: 最後の1時間のデータは含まない
+    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) - datetime.timedelta(hours=1)
+    graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
+
+    for team in Team.objects.filter(is_active=True):
+        team_graph_data = TeamGraphData(team)
+        for job in Job.objects.filter(status=Job.DONE, team=team, finished_at__lt=graph_end_at).order_by('finished_at').select_related("team"):
+            team_graph_data.append(job)
+
+        # グラフの彩色
+        color, hover_color = next(color_iterator)
+        team_graph_data.assign_color(color, hover_color)
+
+        # 全てのグラフデータを取得
+        datasets.append(team_graph_data.to_dict(partial=False))
+
+    return datasets
+
+
 def graph(request):
-    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return HttpResponse("このエンドポイントはAjax専用です", status=400)
+    # NOTE: CONTEST_START_TIME-10minutes ~ CONTEST_END_TIME+10minutes にするようにmin, maxを渡す
+    graph_start_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_START_TIME) - datetime.timedelta(minutes=10)
+    graph_start_at = graph_start_at.replace(tzinfo=portal_utils.jst)
 
-    context = get_base_context(request.user)
-    team = request.user.team
+    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) + datetime.timedelta(minutes=10)
+    graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
 
-    ranking = [row["team__id"] for row in
-                    Score.objects.passed().values("team__id")[:settings.RANKING_TOPN]]
-
-    client = RedisClient()
-    graph_datasets, graph_min, graph_max = client.get_graph_data(team, ranking, is_last_spurt=context['is_last_spurt'])
+    graph_datasets = get_graph_data()
 
     data = {
         'graph_datasets': graph_datasets,
-        'graph_min': graph_min,
-        'graph_max': graph_max,
+        "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
+        "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
     }
 
     return JsonResponse(
-        data, status = 200
+        data,
+        status=200,
+        headers={
+            "Cache-Control": "public, max-age=60, s-maxage=60",
+        },
     )
 
