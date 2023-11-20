@@ -95,6 +95,9 @@ class User(AbstractUser):
         roles = [settings.DISCORD_USER_ROLE_ID]
         if not self.team or not self.team.is_active:
             roles = []
+        else:
+            if self.team.is_local_participation:
+                roles.append(settings.DISCORD_USER_LOCAL_PARTICIPATION_ROLE_ID)
 
         if self.team:
             nick = "{} ({})".format(self.display_name, self.team.name)
@@ -137,6 +140,7 @@ class Team(models.Model):
     is_guest = models.BooleanField("ゲストチーム", blank=True, default=False)
 
     want_local_participation = models.BooleanField("現地参加を希望する", blank=True)
+    is_local_participation = models.BooleanField("現地参加する", blank=True)
 
     # benchmarker = models.ForeignKey('contest.Benchmarker', verbose_name="ベンチマーカー", on_delete=models.SET_NULL, null=True, blank=True)
 
