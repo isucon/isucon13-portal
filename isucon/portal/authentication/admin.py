@@ -87,7 +87,7 @@ class EnvCheckListFilter(IsSetListFilter):
 
 class TeamAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "owner", "is_guest", "is_active", "envcheck_was_done", "created_at", "declined_at"]
-    list_filter = ["is_active", "is_guest", EnvCheckListFilter]
+    list_filter = ["is_active", "is_guest", "want_local_participation", "is_local_participation", EnvCheckListFilter]
     search_fields = ["name"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
