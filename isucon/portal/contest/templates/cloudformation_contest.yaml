@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  AWS CloudFormation for ISUCON13 Environment Checks
+  AWS CloudFormation for ISUCON13 Final
 Resources:
   GetAvailabilityZoneFunctionExecutionRole:
     Type: AWS::IAM::Role
@@ -35,7 +35,7 @@ Resources:
             if event['RequestType'] == "Create":
               ec2 = boto3.client('ec2')
               response = ec2.describe_availability_zones(
-                ZoneIds = ['{{ az_id }}']
+                ZoneIds = ['apne1-az2']
               )
               ZoneName = response['AvailabilityZones'][0]['ZoneName']
               cfnresponse.send(event, context, cfnresponse.SUCCESS, {"ZoneName" : ZoneName})
@@ -44,7 +44,7 @@ Resources:
             elif event['RequestType'] == "Delete":
               cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
       Handler: index.handler
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 30
       Role: !GetAtt GetAvailabilityZoneFunctionExecutionRole.Arn
   GetAvailabilityZone:
@@ -88,16 +88,29 @@ Resources:
     Properties:
       SubnetId: !Ref Subnet
       RouteTableId: !Ref RouteTable
+    DependsOn:
+      - Subnet
+      - RouteTable
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref VPC
-      GroupDescription: Enable SSH access via port 22
+      GroupDescription: Security Group for ISUCON13 Final
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: "22"
           ToPort: "22"
           CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: "443"
+          ToPort: "443"
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: udp
+          FromPort: "53"
+          ToPort: "53"
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: -1
+          CidrIp: "192.168.0.0/24"
 
   InstanceRole:
     Type: AWS::IAM::Role
@@ -112,6 +125,8 @@ Resources:
             Action:
               - sts:AssumeRole
       Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
         - PolicyName: IsuconEC2InstancePolicy
           PolicyDocument:
@@ -132,24 +147,24 @@ Resources:
       Roles:
         - !Ref InstanceRole
 
-  EnvcheckInstance:
+  FinalInstance1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: {{ ami_id }}
-      InstanceType: t3.micro
+      ImageId: "{{ ami_id }}"
+      InstanceType: c5.large
       SecurityGroupIds:
         - !Ref SecurityGroup
       SubnetId: !Ref Subnet
-      IamInstanceProfile:
-        !Ref InstanceProfile
+      PrivateIpAddress: "192.168.0.11"
+      IamInstanceProfile: !Ref InstanceProfile
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
-            VolumeSize: 8
-            VolumeType: gp2
+            VolumeSize: 40
+            VolumeType: gp3
       Tags:
         - Key: Name
-          Value: isucon13-envcheck
+          Value: isucon13-final-1
       UserData:
         Fn::Base64: |
           #cloud-config
@@ -164,8 +179,82 @@ Resources:
             permissions: '0644'
             encoding: b64
             content: "{{ portal_credentials }}"
-  EnvcheckInstanceIP:
+  FinalInstanceIP1:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
-      InstanceId: !Ref EnvcheckInstance
+      InstanceId: !Ref FinalInstance1
+  FinalInstance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "{{ ami_id }}"
+      InstanceType: c5.large
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref Subnet
+      PrivateIpAddress: "192.168.0.12"
+      IamInstanceProfile: !Ref InstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 40
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: isucon13-final-2
+      UserData:
+        Fn::Base64: |
+          #cloud-config
+          write_files:
+          - path: /home/isucon/.ssh/authorized_keys
+            owner: isucon:isucon
+            permissions: '0600'
+            encoding: b64
+            content: "{{ authorized_keys }}"
+          - path: /opt/isucon-env-checker/portal_credentials.json
+            owner: root:root
+            permissions: '0644'
+            encoding: b64
+            content: "{{ portal_credentials }}"
+  FinalInstanceIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref FinalInstance2
+  FinalInstance3:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "{{ ami_id }}"
+      InstanceType: c5.large
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref Subnet
+      PrivateIpAddress: "192.168.0.13"
+      IamInstanceProfile: !Ref InstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 40
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: isucon13-final-3
+      UserData:
+        Fn::Base64: |
+          #cloud-config
+          write_files:
+          - path: /home/isucon/.ssh/authorized_keys
+            owner: isucon:isucon
+            permissions: '0600'
+            encoding: b64
+            content: "{{ authorized_keys }}"
+          - path: /opt/isucon-env-checker/portal_credentials.json
+            owner: root:root
+            permissions: '0644'
+            encoding: b64
+            content: "{{ portal_credentials }}"
+  FinalInstanceIP3:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref FinalInstance3
