@@ -32,14 +32,14 @@ admin.site.register(Information, InformationAdmin)
 
 
 class ScoreAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "best_score", "latest_score", "latest_is_passed"]
-    list_filter = ["latest_is_passed"]
+    list_display = ["id", "team", "best_score", "latest_score", "latest_is_passed", "test_score", "test_is_passed"]
+    list_filter = ["latest_is_passed", "test_is_passed"]
 
 admin.site.register(Score, ScoreAdmin)
 
 class JobAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "status", "target", "is_passed", "score", "reason_short"]
-    list_filter = ["status", "is_passed", "team"]
+    list_display = ["id", "team", "status", "target", "is_active", "is_test", "is_passed", "score", "reason_short"]
+    list_filter = ["status", "is_passed", "is_test", "is_active", "team"]
 
     def reason_short(self, instance):
         line = instance.reason.split("\n")[0]

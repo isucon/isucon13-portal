@@ -76,14 +76,15 @@ class Server(LogicalDeleteMixin, models.Model):
 class JobManager(models.Manager):
 
     def of_team(self, team):
-        return self.get_queryset().filter(team=team)
+        # 閲覧可能なチームのJob
+        return self.get_queryset().filter(team=team, is_active=True, is_test=False)
 
     def get_latest_score(self, team):
         """指定チームの最新スコアを取得"""
         # NOTE: orderingにより最新順に並んでいるので、LIMITで取れば良い
-        return self.of_team(team).filter(status=Job.DONE).order_by('-finished_at').first()
+        return self.of_team(team).filter(status=Job.DONE, is_active=True, is_test=False).order_by('-finished_at').first()
 
-    def enqueue(self, team):
+    def enqueue(self, team, is_test=False):
         # 重複チェック
         if self.check_duplicated(team):
             raise exceptions.DuplicateJobError
@@ -92,6 +93,7 @@ class JobManager(models.Manager):
         job = self.model(team=team)
         job.target = Server.objects.get_bench_target(team)
         job.target_ip = job.target.global_ip
+        job.is_test = is_test
         job.save(using=self._db)
 
         # SQSに送信
@@ -146,7 +148,9 @@ class Job(models.Model):
 
     # Choice系
     status = models.CharField("進捗", max_length=100, choices=STATUS_CHOICES, default=WAITING)
-    is_passed = models.BooleanField("正答フラグ", default=False)
+    is_passed = models.BooleanField("正答フラグ", default=False, blank=True)
+    is_active = models.BooleanField("有効かどうか", default=True, blank=True)
+    is_test = models.BooleanField("テストかどうか", default=False, blank=True)
 
     reason = models.TextField("結果メッセージ", blank=True)
     score = models.IntegerField("獲得スコア", default=0, null=False)
@@ -193,8 +197,10 @@ class Job(models.Model):
     def send_to_queue(self):
         data = {
             "id": self.id,
+            "action": "benchmark",
             "team": self.team_id,
             "target_ip": self.target_ip,
+            "is_test": self.is_test,
             "servers":[s.global_ip for s in Server.objects.of_team(self.team)],
         }
         sqs_client = boto3.client("sqs")
@@ -204,7 +210,7 @@ class Job(models.Model):
             MessageGroupId="job",
             MessageDeduplicationId=str(self.id),
         )
-        print(response)
+        print(data, response)
 
     def abort(self, reason, stdout, stderr):
         self.status = Job.ABORTED
@@ -237,22 +243,43 @@ class Score(LogicalDeleteMixin, models.Model):
     latest_scored_at = models.DateTimeField('最新スコア日時', blank=True, null=True)
     latest_is_passed = models.BooleanField('最新のベンチマーク成否フラグ', default=False, blank=True)
 
+    test_score = models.IntegerField('テストスコア', null=True, blank=True)
+    test_scored_at = models.DateTimeField('テストスコア日時', blank=True, null=True)
+    test_is_passed = models.BooleanField('テストベンチマーク成否フラグ', default=False, blank=True)
+
     objects = ScoreManager()
 
     def update(self):
         """Jobから再計算します"""
+
+        job_queryset = Job.objects.filter(team=self.team, status=Job.DONE, is_test=False, is_active=True)
+        test_job_queryset = Job.objects.filter(team=self.team, status=Job.DONE, is_test=True, is_active=True)
+
+        # 本番スコア
         try:
-            latest_job = Job.objects.filter(team=self.team, status=Job.DONE).order_by("-finished_at")[0]
+            latest_job = job_queryset.order_by("-finished_at")[0]
             self.latest_score = latest_job.score
             self.latest_scored_at = latest_job.finished_at
             self.latest_is_passed = latest_job.is_passed
         except IndexError:
-            pass
+            self.latest_score = 0
+            self.latest_scored_at = None
+            self.latest_is_passed = False
 
         try:
-            best_score_job = Job.objects.filter(team=self.team, status=Job.DONE, is_passed=True).order_by("-score")[0]
+            best_score_job = job_queryset.filter(is_passed=True).order_by("-score")[0]
             self.best_score = best_score_job.score
             self.best_scored_at = best_score_job.finished_at
+        except IndexError:
+            self.best_score = 0
+            self.best_scored_at = None
+
+        # テストスコア
+        try:
+            latest_job = test_job_queryset.order_by("-finished_at")[0]
+            self.test_score = latest_job.score
+            self.test_scored_at = latest_job.finished_at
+            self.test_is_passed = latest_job.is_passed
         except IndexError:
             pass
 
