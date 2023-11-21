@@ -25,7 +25,7 @@ def get_info(request):
     return JsonResponse({
         "name": name,
         "ami_id": settings.CONTEST_AMI_ID,
-        "az_id": settings.CONTEST_AZ_ID,
+        "az_id": request.team.aws_az,
     })
 
 

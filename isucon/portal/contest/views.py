@@ -194,7 +194,7 @@ def cloudformation_contest(request):
     }
 
     context = {
-        "az_id": settings.CONTEST_AZ_ID,
+        "az_id": team.aws_az,
         "ami_id": settings.CONTEST_AMI_ID,
         "authorized_keys": base64.b64encode(authorized_keys.encode("utf-8")).decode("ascii"),
         "portal_credentials": base64.b64encode(json.dumps(portal_credentials).encode("utf-8")).decode("ascii"),

@@ -84,7 +84,6 @@ ENVCHECK_AZ_ID = "apne1-az1"
 ENVCHECK_DEVELOP = True
 
 CONTEST_AMI_ID = "ami-001e2fc2b4d547ed6"
-CONTEST_AZ_ID = "apne1-az1"
 
 
 # アプリケーション固有設定
