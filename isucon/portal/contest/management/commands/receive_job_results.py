@@ -31,11 +31,13 @@ class Command(BaseCommand):
             return None
 
         for message in response["Messages"]:
-            pprint.pprint(message)
-
             try:
                 body = json.loads(message["Body"])
 
+                if not body:
+                    continue
+
+                pprint.pprint(message)
                 with transaction.atomic():
                     # DBを更新する
                     try:
