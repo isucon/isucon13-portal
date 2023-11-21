@@ -207,7 +207,7 @@ class Job(models.Model):
         response = sqs_client.send_message(
             QueueUrl=settings.SQS_JOB_URL,
             MessageBody=json.dumps(data),
-            MessageGroupId="job",
+            MessageGroupId=self.team.aws_az,
             MessageDeduplicationId=str(self.id),
         )
         print(data, response)

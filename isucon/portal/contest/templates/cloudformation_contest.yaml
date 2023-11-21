@@ -35,7 +35,7 @@ Resources:
             if event['RequestType'] == "Create":
               ec2 = boto3.client('ec2')
               response = ec2.describe_availability_zones(
-                ZoneIds = ['apne1-az2']
+                ZoneIds = ['{{ az_id }}']
               )
               ZoneName = response['AvailabilityZones'][0]['ZoneName']
               cfnresponse.send(event, context, cfnresponse.SUCCESS, {"ZoneName" : ZoneName})
