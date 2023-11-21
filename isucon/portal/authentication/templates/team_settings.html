@@ -86,6 +86,19 @@
     </article>
     {% endif %}
 
+	<article class="message is-primary">
+	      <div class="message-body content">
+		<p>
+		  競技環境作成用Cloudformation
+		</p>
+		<p>
+		  <a href="{% url "cloudformation_contest" %}">
+		    <button class="button is-info is-small">競技環境Cloudformationテンプレート</button>
+		  </a>
+		</p>
+	      </div>
+	</article>
+
     {% if not user.discord_id %}
     <article class="message is-danger">
       <div class="message-body">

@@ -73,10 +73,18 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "isucon13-po
 
 # 登録期間
 REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 22, 10, 0, 0)
-REGISTRATION_END_AT = portal_utils.get_jst_datetime(2023, 9, 10, 9, 0, 0)
+REGISTRATION_END_AT = portal_utils.get_jst_datetime(2025, 9, 10, 9, 0, 0)
 
 # 最大チーム数
-MAX_TEAM_NUM = 2
+MAX_TEAM_NUM = 20
+
+# AWS
+ENVCHECK_AMI_ID = "ami-04a7c0e0153437272"
+ENVCHECK_AZ_ID = "apne1-az1"
+ENVCHECK_DEVELOP = True
+
+CONTEST_AMI_ID = "ami-001e2fc2b4d547ed6"
+CONTEST_AZ_ID = "apne1-az1"
 
 
 # アプリケーション固有設定
