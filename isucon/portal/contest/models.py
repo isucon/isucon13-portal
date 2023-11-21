@@ -223,6 +223,13 @@ class Job(models.Model):
 
 class ScoreManager(models.Manager):
 
+    def active(self):
+        return self.get_queryset().filter(
+            team__is_active=True,
+        ).filter(
+            latest_is_passed=True, test_is_passed=True,
+        )
+
     def passed(self):
         return self.get_queryset().filter(latest_is_passed=True)
 
