@@ -13,6 +13,19 @@
     </nav>
     {% endblock %}
 
+	<article class="message is-primary">
+        <div class="message-body content">
+      <p>
+        競技環境作成用 CloudFormation
+      </p>
+      <p>
+        <a href="{% url "cloudformation_contest" %}">
+          <button class="button is-info is-small">競技環境 CloudFormation テンプレート</button>
+        </a>
+      </p>
+        </div>
+    </article>
+
     {% if not staff %}
       {% include "includes/job_enqueue.html" %}
       {% include "includes/recent_jobs.html" %}
