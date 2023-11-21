@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.utils import timezone
 
 from isucon.portal import utils as portal_utils
@@ -150,6 +150,32 @@ def servers(request):
         "servers": servers,
     })
     return render(request, "servers.html", context)
+
+
+@team_is_authenticated
+@team_is_now_on_contest
+def delete_server(request, pk):
+    if request.method != "DELETE":
+        return HttpResponseNotAllowed(["DELETE"])
+
+    server = get_object_or_404(Server.objects.of_team(request.user.team), pk=pk)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if server.is_bench_target:
+        messages.warning(request, "ベンチマーク対象のサーバは削除できません")
+        if is_ajax:
+            print("ajax error")
+            return HttpResponse("Error")
+        return redirect("servers")
+
+    server.delete()
+
+    if is_ajax:
+        return JsonResponse({}, status=200)
+
+    messages.success(request, "サーバを削除しました")
+    return redirect("servers")
+
 
 @team_is_authenticated
 @team_is_now_on_contest
