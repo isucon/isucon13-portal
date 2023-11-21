@@ -45,6 +45,7 @@ django-ipware = "*"
 django-stdimage = "*"
 django-pglock = "*"
 psycopg2-binary = "*"
+async-timeout = "*"
 
 [requires]
 python_version = "3.11"

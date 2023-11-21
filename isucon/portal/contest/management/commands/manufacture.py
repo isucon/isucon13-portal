@@ -39,13 +39,12 @@ class Command(BaseCommand):
             job = JobFactory.create(team=team)
             job.target = Server.objects.get_bench_target(team)
             job.target_ip = job.target.global_ip
-            job.benchmarker = team.benchmarker
             job.save()
 
     def add_arguments(self, parser):
         parser.add_argument('-t', '--teams', default=10, type=int, help='Number of servers')
         parser.add_argument('-s', '--servers', default=3, type=int, help='Number of servers per team')
-        parser.add_argument('-i', '--informations', default=10, type=int, help='Number of informations')
+        parser.add_argument('-i', '--informations', default=3, type=int, help='Number of informations')
 
     def handle(self, *args, **options):
         team_num = options['teams']

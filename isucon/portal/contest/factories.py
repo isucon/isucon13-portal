@@ -17,7 +17,7 @@ def random_ip(idx):
     return '.'.join(map(str, octets))
 
 
-class InformationFactory(factory.DjangoModelFactory):
+class InformationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Information
 
@@ -25,7 +25,7 @@ class InformationFactory(factory.DjangoModelFactory):
     is_enabled = True
 
 
-class ServerFactory(factory.DjangoModelFactory):
+class ServerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Server
 
@@ -36,7 +36,7 @@ class ServerFactory(factory.DjangoModelFactory):
     private_ip = factory.Sequence(lambda idx: random_ip(idx))
 
 
-class JobFactory(factory.DjangoModelFactory):
+class JobFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Job
 

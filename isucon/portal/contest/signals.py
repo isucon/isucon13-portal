@@ -23,7 +23,7 @@ def update_score(sender, instance, created, **kwargs):
 
     if not Score.objects.filter(team=instance.team).exists():
         # 念のためなかったら作る
-        score = Score.objects.create(team=instance)
+        score = Score.objects.create(team=instance.team)
     else:
         score = instance.team.score
 

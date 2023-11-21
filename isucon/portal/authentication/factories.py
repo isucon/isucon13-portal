@@ -9,7 +9,7 @@ from isucon.portal.authentication import models
 from isucon.portal.contest import factories as contest_factories
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
@@ -19,7 +19,7 @@ class UserFactory(factory.DjangoModelFactory):
     # なお、シード生成の時にチームの人数がランダムになるので、そこで調整が入り、学生の増減がでる
     is_student = factory.Sequence(lambda idx: idx % 9 == 0)
 
-class TeamFactory(factory.DjangoModelFactory):
+class TeamFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Team
 
@@ -27,3 +27,5 @@ class TeamFactory(factory.DjangoModelFactory):
     password = factory.Sequence(lambda idx: make_password("password{}".format(idx)))
 
     is_active = True
+    want_local_participation = factory.Sequence(lambda idx: idx % 5== 0)
+    is_local_participation = factory.Sequence(lambda idx: idx % 10 == 0)
