@@ -205,7 +205,7 @@ class Job(models.Model):
         }
         sqs_client = boto3.client("sqs")
         response = sqs_client.send_message(
-            QueueUrl=settings.SQS_JOB_URL,
+            QueueUrl=settings.SQS_JOB_URLS[self.team.aws_az],
             MessageBody=json.dumps(data),
             MessageGroupId=self.team.aws_az,
             MessageDeduplicationId=str(self.id),
