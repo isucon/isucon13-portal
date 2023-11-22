@@ -10,7 +10,9 @@ export function useGraph(config?: SWRConfiguration) {
 }
 
 function fetchGraph(): Promise<GraphDataResponse> {
-  return fetch('/contest/graph/').then((response) => response.json());
+  const d = (new Date().valueOf() / 1000) | 0;
+  const ts = d - (d % 5);
+  return fetch(`/contest/graph/?ts=${ts}`).then((response) => response.json());
 }
 
 export function useRank(useDummy: boolean, config?: SWRConfiguration) {

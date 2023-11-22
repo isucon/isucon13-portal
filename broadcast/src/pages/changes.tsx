@@ -15,9 +15,9 @@ export default function ChangesPage(): React.ReactElement {
   const dummy = !!(parseInt(searchParams.get('dummy') ?? '0') || 0);
 
   const rank = useRank(dummy, {
-    refreshInterval: 3000,
-    focusThrottleInterval: 3000,
-    dedupingInterval: 3000,
+    refreshInterval: 5000,
+    focusThrottleInterval: 5000,
+    dedupingInterval: 5000,
   });
 
   const changes = rank.data?.summaries
