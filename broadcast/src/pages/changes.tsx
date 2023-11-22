@@ -4,9 +4,14 @@ import React from 'react';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { GoTriangleRight } from 'react-icons/go';
 import { HiAcademicCap } from 'react-icons/hi2';
+import { useSearchParams } from 'react-router-dom';
 import { TeamSummary, useRank } from '~/utils/hooks';
 
 export default function ChangesPage(): React.ReactElement {
+  const [searchParams] = useSearchParams();
+  const limit = parseInt(searchParams.get('limit') ?? '6') || 6;
+  const bottom = !!(parseInt(searchParams.get('bottom') ?? '0') || 0);
+
   const rank = useRank({
     refreshInterval: 3000,
     focusThrottleInterval: 3000,
@@ -15,16 +20,17 @@ export default function ChangesPage(): React.ReactElement {
 
   const changes = rank.data?.summaries
     .filter((summary) => summary.rankChanged && summary.scoreChanged)
-    .slice(0, 10);
+    .sort((a, b) => b.currentScore - a.currentScore)
+    .slice(0, limit);
 
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: 2,
-        height: 'calc(100vh - 32px)',
-        justifyContent: 'flex-end',
+        p: '50px',
+        minHeight: 'calc(100vh - 100px)',
+        justifyContent: bottom ? 'flex-end' : 'flex-start',
       }}
       gap="5px"
     >
@@ -49,7 +55,7 @@ export default function ChangesPage(): React.ReactElement {
 function ChangeRow({ summary }: { summary: TeamSummary }): React.ReactElement {
   const scoreChanges = summary.currentScore - summary.lastScore;
   const isScoreUp = scoreChanges > 0;
-  const isRankUp = summary.currentRank > summary.lastRank;
+  const isRankUp = summary.currentRank < summary.lastRank;
 
   return (
     <Box
@@ -131,7 +137,7 @@ function ChangeRow({ summary }: { summary: TeamSummary }): React.ReactElement {
       {/****** SCORES ******/}
       <Box
         sx={{
-          flex: '0 0 100px',
+          flex: '0 0 80px',
           textAlign: 'right',
           px: 2,
           display: 'flex',

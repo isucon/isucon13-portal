@@ -1,9 +1,14 @@
 import Box from '@mui/joy/Box';
 import React from 'react';
 import { HiAcademicCap } from 'react-icons/hi2';
+import { useSearchParams } from 'react-router-dom';
 import { TeamSummary, useRank } from '~/utils/hooks';
 
 export default function RankPage(): React.ReactElement {
+  const [searchParams] = useSearchParams();
+  const limit = parseInt(searchParams.get('limit') ?? '15') || 15;
+  const bottom = !!(parseInt(searchParams.get('bottom') ?? '0') || 0);
+
   const rank = useRank({
     refreshInterval: 3000,
     focusThrottleInterval: 3000,
@@ -15,12 +20,14 @@ export default function RankPage(): React.ReactElement {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: 2,
+        p: '50px',
+        minHeight: 'calc(100vh - 100px)',
+        justifyContent: bottom ? 'flex-end' : 'flex-start',
       }}
     >
-      {rank.data?.summaries.map((summary) => (
-        <TeamRow key={summary.name} summary={summary} />
-      ))}
+      {rank.data?.summaries
+        .slice(0, limit)
+        .map((summary) => <TeamRow key={summary.name} summary={summary} />)}
     </Box>
   );
 }
@@ -66,7 +73,7 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
       </Box>
       <Box
         sx={{
-          flex: '0 0 100px',
+          flex: '0 0 70px',
           textAlign: 'right',
           p: 1,
           fontWeight: 'bold',

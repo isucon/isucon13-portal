@@ -1,9 +1,8 @@
 import { GraphData, GraphDataResponse, GraphDataset } from './types';
 
-const teams = new Array(10).fill(undefined).map((_, i) => ({
-  name: `Team ${i}`,
+const teams = new Array(50).fill(undefined).map((_, i) => ({
+  name: `Team ${i}`.repeat(i % 7 === 0 ? 7 : 1),
 }));
-teams.push({ name: 'Team 10'.repeat(10) });
 
 export function fetchMockGraph(): () => Promise<GraphDataResponse> {
   let count = 0;
@@ -13,14 +12,6 @@ export function fetchMockGraph(): () => Promise<GraphDataResponse> {
       count++;
       const datasets: GraphDataset[] = teams.map((team, teamIndex) => {
         const random = new Random(teamIndex);
-        // const data: GraphData[] = new Array(count)
-        //   .fill(undefined)
-        //   .map((_, i) => ({
-        //     x: new Date(
-        //       new Date('2023-11-25 09:00:00').valueOf() + i * 5000,
-        //     ).toISOString(),
-        //     y: random.nextInt(500, 1000 + i * 100),
-        //   }));
 
         const data: GraphData[] = [];
         let lastScore = 0;
