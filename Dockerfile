@@ -4,7 +4,6 @@ WORKDIR /opt/app
 COPY ./broadcast/package.json .
 COPY ./broadcast/yarn.lock .
 COPY ./broadcast/.yarnrc.yml .
-COPY ./broadcast/.yarn/ ./.yarn/
 RUN corepack enable
 RUN yarn install --immutable
 COPY ./broadcast .
