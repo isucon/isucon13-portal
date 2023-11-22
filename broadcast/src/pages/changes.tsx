@@ -5,6 +5,7 @@ import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { GoTriangleRight } from 'react-icons/go';
 import { HiAcademicCap } from 'react-icons/hi2';
 import { useSearchParams } from 'react-router-dom';
+import { formatScore } from '~/utils/format';
 import { TeamSummary, useRank } from '~/utils/hooks';
 
 export default function ChangesPage(): React.ReactElement {
@@ -154,14 +155,14 @@ function ChangeRow({ summary }: { summary: TeamSummary }): React.ReactElement {
             height: '1em',
           }}
         >
-          {summary.currentScore}
+          {formatScore(summary.currentScore)}
         </Typography>
         <Typography
           level="body-xs"
           sx={{
             color: isScoreUp ? '#c44' : '#39c',
           }}
-        >{`${isScoreUp ? '+' : ''}${scoreChanges}`}</Typography>
+        >{`${isScoreUp ? '+' : ''}${formatScore(scoreChanges)}`}</Typography>
       </Box>
     </Box>
   );

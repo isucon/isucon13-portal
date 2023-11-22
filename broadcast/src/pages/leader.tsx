@@ -2,6 +2,7 @@ import Box from '@mui/joy/Box';
 import React from 'react';
 import { HiAcademicCap } from 'react-icons/hi2';
 import { useSearchParams } from 'react-router-dom';
+import { formatScore } from '~/utils/format';
 import { TeamSummary, useRank } from '~/utils/hooks';
 
 export default function RankPage(): React.ReactElement {
@@ -88,7 +89,7 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
             {summary.currentScore}
           </>
         ) : ( */}
-        <>{summary.currentScore}</>
+        <>{formatScore(summary.currentScore)}</>
         {/* )} */}
       </Box>
     </Box>
