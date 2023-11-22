@@ -142,7 +142,7 @@ function ChangeRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           color: '#fff',
         }}
       >
-        <HiAcademicCap />
+        {summary.team.has_student && <HiAcademicCap />}
       </Box>
       {/****** SCORES ******/}
       <Box

@@ -85,7 +85,7 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           fontSize: '15px',
         }}
       >
-        <HiAcademicCap />
+        {summary.team.has_student && <HiAcademicCap />}
       </Box>
       <Box
         sx={{
