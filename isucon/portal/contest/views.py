@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.utils import timezone
+from django.db.models import F, OuterRef, Func, Subquery
 
 from isucon.portal import utils as portal_utils
 from isucon.portal.authentication.decorators import team_is_authenticated
@@ -261,10 +262,33 @@ def graph(request):
 
     graph_datasets = get_graph_data()
 
+    # ランキング情報
+
+    student_count_subquery = User.objects.filter(
+        team_id=OuterRef("team_id"), 
+        is_student=True,
+    ).order_by().annotate(student_count=Func(F('id'), function='Count')).values('student_count')
+
+    scores = Score.objects.annotate(
+            student_count=Subquery(student_count_subquery),
+    ).filter(team__is_active=True).select_related("team").order_by("-latest_score")
+
     data = {
         'graph_datasets': graph_datasets,
         "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
         "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
+        "ranking": [
+            {
+                "team": {
+                    "id": score.team.id,
+                    "name": score.team.name,
+                    "has_student": score.student_count > 0,
+                    "is_guest": score.team.is_guest,
+                },
+                "latest_score": score.latest_score,
+                "rank": rank,
+            } for rank, score in enumerate(scores, start=1)
+        ]
     }
 
     return JsonResponse(
