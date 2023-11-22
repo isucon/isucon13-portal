@@ -9,6 +9,9 @@ export default function IndexPage(): React.ReactElement {
         <li>
           <Link to="/leader">Leader boead</Link>
         </li>
+        <li>
+          <Link to="/changes">Changes</Link>
+        </li>
       </ul>
     </div>
   );

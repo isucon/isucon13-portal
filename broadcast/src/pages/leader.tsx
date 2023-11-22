@@ -1,5 +1,4 @@
 import Box from '@mui/joy/Box';
-import Typography from '@mui/joy/Typography';
 import React from 'react';
 import { HiAcademicCap } from 'react-icons/hi2';
 import { TeamSummary, useRank } from '~/utils/hooks';
@@ -74,16 +73,16 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           height: '1em',
         }}
       >
-        {summary.scoreChanged ? (
+        {/* {summary.scoreChanged ? (
           <>
             <Typography level="body-xs" sx={{ display: 'inline' }}>
               {`${summary.lastScore}→ `}
             </Typography>
             {summary.currentScore}
           </>
-        ) : (
-          <>{summary.currentScore}</>
-        )}
+        ) : ( */}
+        <>{summary.currentScore}</>
+        {/* )} */}
       </Box>
     </Box>
   );
