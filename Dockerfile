@@ -1,3 +1,16 @@
+FROM node:20-alpine AS frontend
+
+WORKDIR /opt/app
+COPY ./broadcast/package.json .
+COPY ./broadcast/yarn.lock .
+COPY ./broadcast/.yarnrc.yml .
+COPY ./broadcast/.yarn/ ./.yarn/
+RUN corepack enable
+RUN yarn install --immutable
+COPY ./broadcast .
+RUN yarn build
+
+
 FROM python:3.11 AS app
 
 RUN pip install --upgrade pip && pip install pipenv
@@ -31,6 +44,7 @@ RUN ln -s /opt/app/static /var/www/html/static
 ADD files/nginx.conf /etc/nginx/nginx.conf
 ADD files/default.conf /etc/nginx/sites-enabled/default
 ADD files/.htpasswd /etc/nginx/.htpasswd
+COPY --from=frontend /opt/app/dist /var/www/html/broadcast_view
 
 EXPOSE 80
 

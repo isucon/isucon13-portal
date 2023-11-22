@@ -7,3 +7,7 @@ kubernetes/
 nginx/
 logs/
 data/
+broadcast/node_modules/
+broadcast/.yarn/cache/
+broadcast/.yarn/install-state.gz
+
