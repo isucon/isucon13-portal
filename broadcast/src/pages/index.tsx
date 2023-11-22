@@ -18,6 +18,9 @@ export default function IndexPage(): React.ReactElement {
             <li>
               <Link to="/leader?limit=10&bottom=1">limit 10 & bottom</Link>
             </li>
+            <li>
+              <Link to="/leader?dummy=1">use dummy data</Link>
+            </li>
           </ul>
         </li>
         <li>
@@ -32,7 +35,13 @@ export default function IndexPage(): React.ReactElement {
             <li>
               <Link to="/changes?limit=10&bottom=1">limit 10 & bottom</Link>
             </li>
+            <li>
+              <Link to="/changes?dummy=1">use dummy data</Link>
+            </li>
           </ul>
+        </li>
+        <li>
+          <Link to="/clock">Clock</Link>
         </li>
       </ul>
     </div>

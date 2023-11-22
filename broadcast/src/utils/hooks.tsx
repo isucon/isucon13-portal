@@ -3,15 +3,23 @@
 import React from 'react';
 import useSWR, { type SWRConfiguration } from 'swr';
 import { fetchMockGraph } from './mock';
-import { GraphDataset } from './types';
+import { GraphDataResponse, GraphDataset } from './types';
 
-export function useRank(config?: SWRConfiguration) {
+export function useGraph(config?: SWRConfiguration) {
+  return useSWR('/contest/graph/', fetchGraph, config);
+}
+
+function fetchGraph(): Promise<GraphDataResponse> {
+  return fetch('/contest/graph/').then((response) => response.json());
+}
+
+export function useRank(useDummy: boolean, config?: SWRConfiguration) {
   const ref = React.useRef(fetchMockGraph());
   const lsat = React.useRef<TeamCurrentAggs[]>();
   return useSWR(
-    '/console/graph/',
+    '/contest/graph/?summary',
     async () => {
-      const current = await ref.current();
+      const current = await (useDummy ? ref.current() : fetchGraph());
       const aggs = convertToAggs(current.graph_datasets);
       const summaries = teamAggsToSummary(aggs, lsat.current);
       lsat.current = aggs;

@@ -9,8 +9,9 @@ export default function RankPage(): React.ReactElement {
   const [searchParams] = useSearchParams();
   const limit = parseInt(searchParams.get('limit') ?? '15') || 15;
   const bottom = !!(parseInt(searchParams.get('bottom') ?? '0') || 0);
+  const dummy = !!(parseInt(searchParams.get('dummy') ?? '0') || 0);
 
-  const rank = useRank({
+  const rank = useRank(dummy, {
     refreshInterval: 3000,
     focusThrottleInterval: 3000,
     dedupingInterval: 3000,
@@ -21,10 +22,12 @@ export default function RankPage(): React.ReactElement {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: '50px',
-        minHeight: 'calc(100vh - 100px)',
+        px: '50px',
+        py: '25px',
+        minHeight: 'calc(100vh - 50px)',
         justifyContent: bottom ? 'flex-end' : 'flex-start',
       }}
+      gap="2px"
     >
       {rank.data?.summaries
         .slice(0, limit)
@@ -34,16 +37,27 @@ export default function RankPage(): React.ReactElement {
 }
 
 function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
+  const innerPadding = '5px';
+
   return (
-    <Box sx={{ display: 'flex', background: '#f5f5f5' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        background: /* #f5f5f5 */ 'rgba(255,255,255,0.9)',
+      }}
+    >
       <Box
         sx={{
           flex: '0 0 30px',
           textAlign: 'center',
-          p: 1,
+          px: '10px',
+          py: innerPadding,
           background: '#273',
           color: '#fff',
           fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {summary.currentRank}
@@ -51,9 +65,9 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
       <Box
         sx={{
           flex: '1 0 100px',
-          p: 1,
+          px: '15px',
+          py: innerPadding,
           overflow: 'hidden',
-          height: '1em',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
         }}
@@ -68,6 +82,7 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           alignItems: 'center',
           justifyContent: 'center',
           color: '#fff',
+          fontSize: '15px',
         }}
       >
         <HiAcademicCap />
@@ -76,9 +91,11 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
         sx={{
           flex: '0 0 70px',
           textAlign: 'right',
-          p: 1,
+          px: '10px',
+          py: innerPadding,
           fontWeight: 'bold',
-          height: '1em',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {/* {summary.scoreChanged ? (

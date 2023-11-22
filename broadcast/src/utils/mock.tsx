@@ -1,7 +1,7 @@
 import { GraphData, GraphDataResponse, GraphDataset } from './types';
 
-const teams = new Array(50).fill(undefined).map((_, i) => ({
-  name: `Team ${i}`.repeat(i % 7 === 0 ? 7 : 1),
+const teams = new Array(30).fill(undefined).map((_, i) => ({
+  name: `Team ${i}`.repeat(i % 7 === 0 ? 15 : 1),
 }));
 
 export function fetchMockGraph(): () => Promise<GraphDataResponse> {

@@ -12,8 +12,9 @@ export default function ChangesPage(): React.ReactElement {
   const [searchParams] = useSearchParams();
   const limit = parseInt(searchParams.get('limit') ?? '6') || 6;
   const bottom = !!(parseInt(searchParams.get('bottom') ?? '0') || 0);
+  const dummy = !!(parseInt(searchParams.get('dummy') ?? '0') || 0);
 
-  const rank = useRank({
+  const rank = useRank(dummy, {
     refreshInterval: 3000,
     focusThrottleInterval: 3000,
     dedupingInterval: 3000,
@@ -29,8 +30,9 @@ export default function ChangesPage(): React.ReactElement {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: '50px',
-        minHeight: 'calc(100vh - 100px)',
+        px: '50px',
+        py: '25px',
+        minHeight: 'calc(100vh - 50px)',
         justifyContent: bottom ? 'flex-end' : 'flex-start',
       }}
       gap="5px"
@@ -38,17 +40,19 @@ export default function ChangesPage(): React.ReactElement {
       {changes?.map((summary) => (
         <ChangeRow key={summary.name} summary={summary} />
       ))}
-      <ChangeRow
-        summary={{
-          name: 'Dummy',
-          currentRank: 123,
-          lastRank: 123,
-          currentScore: 100,
-          lastScore: 90,
-          rankChanged: true,
-          scoreChanged: true,
-        }}
-      />
+      {dummy && (
+        <ChangeRow
+          summary={{
+            name: 'Dummy',
+            currentRank: 123,
+            lastRank: 123,
+            currentScore: 100,
+            lastScore: 90,
+            rankChanged: true,
+            scoreChanged: true,
+          }}
+        />
+      )}
     </Box>
   );
 }
