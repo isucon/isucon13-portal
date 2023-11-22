@@ -108,7 +108,7 @@ class JobManager(models.Manager):
         deadline = timezone.now() + datetime.timedelta(seconds=timeout_sec)
 
         # タイムアウトした(=締め切りより更新時刻が古い) ジョブを aborted にしていく
-        jobs = Job.objects.filter(status=Job.RUNNING, updated_at__lt=deadline)
+        jobs = Job.objects.filter(status__in=[Job.RUNNING, Job.WAITING], updated_at__lt=deadline)
         for job in jobs:
             job.abort(reason="Benchmark timeout", stdout='', stderr='')
 
