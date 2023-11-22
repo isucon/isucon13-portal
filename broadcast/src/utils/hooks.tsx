@@ -3,7 +3,7 @@
 import React from 'react';
 import useSWR, { type SWRConfiguration } from 'swr';
 import { fetchMockGraph } from './mock';
-import { GraphDataResponse, GraphDataset } from './types';
+import { GraphDataResponse, Ranking, Team } from './types';
 
 export function useGraph(config?: SWRConfiguration) {
   return useSWR('/contest/graph/', fetchGraph, config);
@@ -17,28 +17,21 @@ function fetchGraph(): Promise<GraphDataResponse> {
 
 export function useRank(useDummy: boolean, config?: SWRConfiguration) {
   const ref = React.useRef(fetchMockGraph());
-  const lsat = React.useRef<TeamCurrentAggs[]>();
+  const lsat = React.useRef<Ranking[]>();
   return useSWR(
     '/contest/graph/?summary',
     async () => {
       const current = await (useDummy ? ref.current() : fetchGraph());
-      const aggs = convertToAggs(current.graph_datasets);
-      const summaries = teamAggsToSummary(aggs, lsat.current);
-      lsat.current = aggs;
+      const summaries = teamAggsToSummary(current.ranking, lsat.current);
+      lsat.current = current.ranking;
       return { summaries };
     },
     config,
   );
 }
 
-interface TeamCurrentAggs {
-  name: string;
-  rank: number;
-  score: number;
-}
-
 export interface TeamSummary {
-  name: string;
+  team: Team;
   currentRank: number;
   currentScore: number;
   lastRank: number;
@@ -47,47 +40,49 @@ export interface TeamSummary {
   scoreChanged: boolean;
 }
 
-function convertToAggs(datasets: GraphDataset[]): TeamCurrentAggs[] {
-  const aggs: TeamCurrentAggs[] = [];
-  datasets.forEach((dataset) => {
-    const latestScore =
-      dataset.data.length > 0
-        ? dataset.data[dataset.data.length - 1]
-        : undefined;
+// function convertToAggs(datasets: GraphDataset[]): Ranking[] {
+//   const aggs: Ranking[] = [];
+//   datasets.forEach((dataset) => {
+//     const latestScore =
+//       dataset.data.length > 0
+//         ? dataset.data[dataset.data.length - 1]
+//         : undefined;
 
-    const agg: TeamCurrentAggs = {
-      name: dataset.label,
-      rank: 0,
-      score: latestScore?.y || 0,
-    };
+//     const agg: Ranking = {
+//       name: dataset.label,
+//       rank: 0,
+//       score: latestScore?.y || 0,
+//     };
 
-    aggs.push(agg);
-  });
+//     aggs.push(agg);
+//   });
 
-  const latestRanks = aggs
-    .map((agg, index) => ({ index, agg }))
-    .sort((a, b) => b.agg.score - a.agg.score);
-  for (let i = 0; i < latestRanks.length; i++) {
-    latestRanks[i].agg.rank = i + 1;
-  }
-  aggs.sort((a, b) => a.rank - b.rank);
+//   const latestRanks = aggs
+//     .map((agg, index) => ({ index, agg }))
+//     .sort((a, b) => b.agg.score - a.agg.score);
+//   for (let i = 0; i < latestRanks.length; i++) {
+//     latestRanks[i].agg.rank = i + 1;
+//   }
+//   aggs.sort((a, b) => a.rank - b.rank);
 
-  return aggs;
-}
+//   return aggs;
+// }
 
 function teamAggsToSummary(
-  currentAggs: TeamCurrentAggs[],
-  lastAggs: TeamCurrentAggs[] | undefined,
+  currentAggs: Ranking[],
+  lastAggs: Ranking[] | undefined,
 ): TeamSummary[] {
   const summaries: TeamSummary[] = [];
   for (const agg of currentAggs) {
-    const lastAgg = lastAggs?.find((lastAgg) => lastAgg.name === agg.name);
+    const lastAgg = lastAggs?.find(
+      (lastAgg) => lastAgg.team.id === agg.team.id,
+    );
     const summary: TeamSummary = {
-      name: agg.name,
+      team: agg.team,
       currentRank: agg.rank,
-      currentScore: agg.score,
+      currentScore: agg.latest_score,
       lastRank: lastAgg?.rank ?? agg.rank,
-      lastScore: lastAgg?.score ?? agg.score,
+      lastScore: lastAgg?.latest_score ?? agg.latest_score,
       rankChanged: false,
       scoreChanged: false,
     };

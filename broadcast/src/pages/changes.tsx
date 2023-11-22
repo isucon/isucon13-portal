@@ -38,12 +38,17 @@ export default function ChangesPage(): React.ReactElement {
       gap="5px"
     >
       {changes?.map((summary) => (
-        <ChangeRow key={summary.name} summary={summary} />
+        <ChangeRow key={summary.team.id} summary={summary} />
       ))}
       {dummy && (
         <ChangeRow
           summary={{
-            name: 'Dummy',
+            team: {
+              id: 123,
+              name: 'Dummy Team 123',
+              has_student: true,
+              is_guest: false,
+            },
             currentRank: 123,
             lastRank: 123,
             currentScore: 100,
@@ -124,7 +129,7 @@ function ChangeRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           textOverflow: 'ellipsis',
         }}
       >
-        {summary.name}
+        {summary.team.name}
       </Box>
       {/****** IS ACADEMIC ******/}
       <Box

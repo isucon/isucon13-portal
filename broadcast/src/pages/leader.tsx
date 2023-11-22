@@ -31,7 +31,7 @@ export default function RankPage(): React.ReactElement {
     >
       {rank.data?.summaries
         .slice(0, limit)
-        .map((summary) => <TeamRow key={summary.name} summary={summary} />)}
+        .map((summary) => <TeamRow key={summary.team.id} summary={summary} />)}
     </Box>
   );
 }
@@ -72,7 +72,7 @@ function TeamRow({ summary }: { summary: TeamSummary }): React.ReactElement {
           textOverflow: 'ellipsis',
         }}
       >
-        {summary.name}
+        {summary.team.name}
       </Box>
       <Box
         sx={{

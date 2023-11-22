@@ -1,4 +1,4 @@
-import { GraphData, GraphDataResponse, GraphDataset } from './types';
+import { GraphData, GraphDataResponse, GraphDataset, Ranking } from './types';
 
 const teams = new Array(30).fill(undefined).map((_, i) => ({
   name: `Team ${i}`.repeat(i % 7 === 0 ? 15 : 1),
@@ -45,10 +45,36 @@ export function fetchMockGraph(): () => Promise<GraphDataResponse> {
         };
       });
 
+      const ranks = datasets
+        .map((dataset, index) => ({ index, dataset }))
+        .sort(
+          (a, b) =>
+            b.dataset.data[b.dataset.data.length - 1].y -
+            a.dataset.data[a.dataset.data.length - 1].y,
+        );
+
+      const ranking: Ranking[] = teams.map((team, teamIndex) => {
+        const score =
+          datasets[teamIndex].data[datasets[teamIndex].data.length - 1].y;
+        const rank = ranks.findIndex((r) => r.index === teamIndex) + 1;
+
+        return {
+          team: {
+            name: team.name,
+            id: teamIndex,
+            has_student: teamIndex % 5 === 0,
+            is_guest: teamIndex % 6 === 0,
+          },
+          latest_score: score,
+          rank,
+        } satisfies Ranking;
+      });
+
       const response: GraphDataResponse = {
         graph_datasets: datasets,
         graph_min: '2023-11-25 09:00:00',
         graph_max: '2023-11-25 18:00:00',
+        ranking,
       };
 
       return setTimeout(() => {

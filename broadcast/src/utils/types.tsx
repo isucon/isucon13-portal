@@ -22,4 +22,18 @@ export interface GraphDataResponse {
   graph_datasets: GraphDataset[];
   graph_min: string;
   graph_max: string;
+  ranking: Ranking[];
+}
+
+export interface Ranking {
+  team: Team;
+  latest_score: number;
+  rank: number;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  has_student: boolean;
+  is_guest: boolean;
 }
