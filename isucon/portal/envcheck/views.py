@@ -45,16 +45,17 @@ def save_result(request):
     else:
         # コンテスト
         if result.name == "contest-boot":
-            # サーバ登録する
-            if Server.objects.of_team(request.team).count() < 3:
-                client_addr, _ = get_client_ip(request)
-                Server.objects.get_or_create(
-                    team=request.team,
-                    global_ip=client_addr,
-                    defaults=dict(
-                        hostname=client_addr,
-                        private_ip=result.ip_address,
-                    ),
-                )
+            if result.passed:
+                # サーバ登録する
+                if Server.objects.of_team(request.team).count() < 3:
+                    client_addr, _ = get_client_ip(request)
+                    Server.objects.get_or_create(
+                        team=request.team,
+                        global_ip=client_addr,
+                        defaults=dict(
+                            hostname=client_addr,
+                            private_ip=result.ip_address,
+                        ),
+                    )
 
     return HttpResponse(status=204)
