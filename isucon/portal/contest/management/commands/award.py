@@ -171,7 +171,8 @@ class Command(BaseCommand):
         target_team = None
         target_team_rate = 0
 
-        for team in Team.objects.filter(is_active=True):
+        for s in Score.objects.active():
+            team = s.team
             best_job = None
             job_queryset = Job.objects.filter(
                 team=team,
@@ -262,10 +263,12 @@ class Command(BaseCommand):
         """
 
         print("さくらインターネット (成功したベンチマークのうち、最もDNSの名前解決成功数が多かったチーム)")
-        try:
-            job = Job.objects.filter(is_test=False, is_passed=True, is_active=True).order_by("-resolved_count")[0]
-            score = Score.objects.get(team=job.team)
-            self.print_score(score, "{}回".format(job.resolved_count))
-        except IndexError:
-            print("該当なし")
+
+        for job in Job.objects.filter(is_test=False, is_passed=True, is_active=True).order_by("-resolved_count"):
+            if Score.objects.active().filter(team=job.team).exists():
+                score = Score.objects.get(team=job.team)
+                self.print_score(score, "{}回".format(job.resolved_count))
+                return
+
+        print("該当なし")
 
