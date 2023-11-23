@@ -47,7 +47,7 @@ class Command(BaseCommand):
         """
         print("いい生活 (11位のチーム)")
         try:
-            score = Score.objects.active().order_by("-latest_score")[11]
+            score = Score.objects.active().order_by("-latest_score")[10]
             self.print_score(score)
         except IndexError:
             print("該当なし")
@@ -222,8 +222,6 @@ class Command(BaseCommand):
                 ).order_by("-score")[0]
             except IndexError:
                 continue
-            
-            print(job1)
 
             diff = score.latest_score - job1.score
 
@@ -247,7 +245,7 @@ class Command(BaseCommand):
 
         print("LINEヤフー (30位のチーム)")
         try:
-            score = Score.objects.active().order_by("-latest_score")[30]
+            score = Score.objects.active().order_by("-latest_score")[29]
             self.print_score(score)
         except IndexError:
             print("該当なし")
