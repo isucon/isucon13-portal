@@ -29,6 +29,7 @@ class Command(BaseCommand):
             if not servers.exists():
                 print("対象なし")
             else:
+                servers.update(is_checked=False)
                 data = {
                     "action": "reboot",
                     "team": team.id,

@@ -1,6 +1,5 @@
 import time
 import logging
-import pprint
 import boto3
 import json
 
@@ -22,7 +21,7 @@ class Command(BaseCommand):
         response = sqs_client.receive_message(
             QueueUrl=settings.SQS_JOB_RESULT_URL,
             AttributeNames=["SentTimestamp"],
-            MaxNumberOfMessages=1,
+            MaxNumberOfMessages=10,
             VisibilityTimeout=0,
             WaitTimeSeconds=wait_time_seconds,
         )
@@ -34,21 +33,19 @@ class Command(BaseCommand):
             try:
                 body = json.loads(message["Body"])
 
-                if not body:
-                    continue
-
-                pprint.pprint(message)
-                with transaction.atomic():
-                    # DBを更新する
-                    try:
-                        instance = Job.objects.get(pk=body["id"])
-                    except Job.DoesNotExist:
-                        continue
-                    serializer = JobResultSerializer(instance=instance, data=body, partial=True)
-                    if serializer.is_valid(raise_exception=False):
-                        serializer.save()
-                    else:
-                        pprint.pprint(serializer.errors)
+                if body:
+                    print("Receive ID:", body["id"])
+                    with transaction.atomic():
+                        # DBを更新する
+                        try:
+                            instance = Job.objects.get(pk=body["id"])
+                        except Job.DoesNotExist:
+                            continue
+                        serializer = JobResultSerializer(instance=instance, data=body, partial=True)
+                        if serializer.is_valid(raise_exception=False):
+                            serializer.save()
+                        else:
+                            print(serializer.errors)
 
                 # 正常に終了したらキューから消す
                 receipt_handle = message["ReceiptHandle"]
@@ -59,6 +56,7 @@ class Command(BaseCommand):
             except Exception:
                 logger.exception("process message error")
 
+        return True
 
     def handle(self, *args, **options):
         while True:

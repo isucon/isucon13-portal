@@ -12,8 +12,15 @@ logger = logging.getLogger("test_run_jobs")
 
 class Command(BaseCommand):
 
+    def add_arguments(self, parser):
+        parser.add_argument('--team', nargs='?', type=int)
+
     def handle(self, *args, **options):
-        for team in Team.objects.filter(is_active=True):
+        queryset = Team.objects.filter(is_active=True)
+        if options["team"]:
+            queryset = queryset.filter(id=options["team"])
+
+        for team in queryset:
             try:
                 job = Job.objects.enqueue(team=team, is_test=True)
                 print(team, job)
