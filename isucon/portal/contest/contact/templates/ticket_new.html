@@ -1,0 +1,30 @@
+{% extends "include/layout.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+
+
+<div class="column is-9">
+
+    <h2 style="font-size: 1.3em;">New Ticket</h2>
+    <form method="post" action="{% url 'ticket_new' %}" style="margin-bottom: 3em;">
+        {% csrf_token %}
+        <div class="">
+            {{ form.as_p }}
+        </div>
+        <div class="is-grouped" style="margin-top: 1em;">
+            <div class="control">
+                <button class="button is-link" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+{% endblock content %}
+
+{% block script %}
+{% endblock script %}

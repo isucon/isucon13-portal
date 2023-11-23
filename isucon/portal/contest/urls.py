@@ -16,4 +16,5 @@ urlpatterns = [
     # path('teams/', views.teams, name="teams"),
     # path('staff/', include("isucon.portal.contest.staff.urls")),
     path('result/', include("isucon.portal.contest.result.urls")),
+    path('contact/', include("isucon.portal.contest.contact.urls")),
 ]

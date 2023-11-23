@@ -15,7 +15,6 @@ class TicketCommentInline(admin.TabularInline):
     model = models.TicketComment
     extra = 1
     formset = TicketInlineFormset
-    readonly_fields = ['owner']
 
     def get_formset(
         self, request: HttpRequest, obj: models.TicketComment | None = None, **kwargs: Any

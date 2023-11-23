@@ -1,0 +1,47 @@
+{% extends "include/layout.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+
+
+<div class="column is-9">
+<div>
+    <!-- create ticket button -->
+    <a href="{% url 'ticket_new' %}" class="button is-link">New Ticket</a>
+
+    <table class="table is-fullwidth is-striped" style="margin-top: 3em;">
+    <thead>
+        <tr>
+            <th>TcketID</th>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Created</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td class="has-text-right">{{ ticket.id }}</td>
+                <td class="">{{ ticket.status }}</td>
+                <td class="">
+                    <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
+                </td>
+                <td class="">{{ ticket.created_at }}</td>
+                <!-- example: 12秒前, 5分以内であれば赤、それ以降は灰色 -->
+                <td class="">
+                    <span class="tag is-small {% if ticket.is_recent %}is-danger{% else %}is-light{% endif %}">{{ ticket.updated_at|naturaltime }}</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+{% endblock script %}

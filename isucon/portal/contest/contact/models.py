@@ -1,7 +1,8 @@
+import datetime
 from django.db import models
-from isucon.portal.models import LogicalDeleteMixin
+from django.utils import timezone
 
-class Ticket(LogicalDeleteMixin, models.Model):
+class Ticket(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チケット"
         ordering = ()
@@ -16,11 +17,16 @@ class Ticket(LogicalDeleteMixin, models.Model):
         ('closed', 'クローズ済み'),
     ]
     status = models.CharField('ステータス', max_length=10, choices=STATUS, default='accepted')
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField("最終更新日時", auto_now=True)
 
     def __str__(self):
         return f"#{self.id}: {self.title}"
 
-class TicketComment(LogicalDeleteMixin, models.Model):
+    def is_recent(self):
+        return self.created_at > timezone.now() - datetime.timedelta(minutes=10)
+
+class TicketComment(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チケットコメント"
         ordering = ()
@@ -28,3 +34,5 @@ class TicketComment(LogicalDeleteMixin, models.Model):
     ticket = models.ForeignKey("Ticket", on_delete=models.CASCADE)
     owner = models.ForeignKey("authentication.User", on_delete=models.CASCADE)
     description = models.TextField('本文')
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField("最終更新日時", auto_now=True)
