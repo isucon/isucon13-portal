@@ -265,22 +265,24 @@ def graph(request):
             student_count=Subquery(student_count_subquery),
     ).filter(team__is_active=True).select_related("team").order_by("-latest_score")
 
+
+    ranking = [
+        {
+            "team": {
+                "id": score.team.id,
+                "name": score.team.name,
+                "has_student": score.student_count > 0,
+                "is_guest": score.team.is_guest,
+            },
+            "latest_score": score.latest_score,
+            "rank": rank,
+        } for rank, score in enumerate(scores, start=1)
+    ]
     data = {
         'graph_datasets': graph_datasets,
         "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
         "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
-        "ranking": [
-            {
-                "team": {
-                    "id": score.team.id,
-                    "name": score.team.name,
-                    "has_student": score.student_count > 0,
-                    "is_guest": score.team.is_guest,
-                },
-                "latest_score": score.latest_score,
-                "rank": rank,
-            } for rank, score in enumerate(scores, start=1)
-        ]
+        "ranking": ranking if timezone.now() < graph_end_at else None,
     }
 
     return JsonResponse(
