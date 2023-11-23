@@ -145,27 +145,35 @@
               Coming soon!
             </h1>
             <h2 class="subtitle">
-                <ul>
-                  <li>8月30日(水)10:00〜　第一期 220枠</li>
-                  <li>9月4日(月)20:00〜　第二期 200枠</li>
-                  <li>9月9日(土)10:00〜　第三期 200枠</li>
-                  <li>10月17日(土)18:00〜　追加募集 若干数</li>
-                </ul>
-                ※募集数の上限に達し次第、締め切る場合があります
+                競技時間 11月25日(土) 10:00~18:00
                 <br>
-                登録後のチームに対するメンバーの追加・チーム情報の変更は10月31日(火)16:00まで
-
+                <br>
+                <ul>
+                  <li>
+                    <a href="https://www.youtube.com/watch?v=YJ1_JnuZp0U" target="_blank">オンラインライブ中継</a>
+                  </li>
+                  <li>
+                    <a href="https://www.youtube.com/watch?v=GesiN0ALdA0" target="_blank">オンライン結果発表ライブ中継</a>
+                  </li>
+                </ul>
+                <br>
                 <br>
                 <div>
                   {% if user.team %}
-                  <a class="button is-white is-outlined is-large" href="{% url "team_settings" %}">
-                    チーム登録情報はこちら
-                  </a>
+                  
+                    {% if is_now_on_contest %}
+                      <a class="button is-white is-outlined is-large" href="{% url "dashboard" %}">
+                        ダッシュボードを開く
+                      </a>
+                    {% else %}
+                      <a class="button is-white is-outlined is-large" href="{% url "team_settings" %}">
+                        チーム登録情報はこちら
+                      </a>
+                    {% endif %}
                   {% else %}
                   <a class="button is-white is-outlined is-large" href="{% url "login" %}">
-                    参加登録！
+                    ログイン
                   </a>
-                  <p>参加登録にはGitHubのアカウントを利用します</p>
                   {% endif %}
                 </div>
             </h2>
