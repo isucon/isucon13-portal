@@ -101,8 +101,8 @@
     {% endif %}
 
     <section class="graph">
-        <canvas id="myChart" width="400" height="400"></canvas>
-        <p>※ 凡例や点をクリックすると、グラフデータが強調表示されます</p>
+        <canvas id="myChart" width="400" height="300" data-my-team="{{ user.team.id }}"></canvas>
+        <p>※ 点をクリックすると、グラフデータが強調表示されます</p>
     </section>
 </div>
 <!-- dummy -->
@@ -116,12 +116,12 @@
 
 function flipAlpha(colorString) {
     var c = Chart.helpers.color(colorString);
-    if (c.alpha() === 1) {
+    if (c.rgb.a === 1) {
         c.alpha(0.2);
     } else {
         c.alpha(1);
     }
-    return c.rgbaString();
+    return c.rgbString();
 }
 
 window.onload = function() {
@@ -135,77 +135,129 @@ window.onload = function() {
             return res.json()
         })
         .then((json) => {
+            const myTeamId =
+                parseInt(document.getElementById('myChart')?.getAttribute('data-my-team') || '') ||
+                undefined;
+            const rank = json.ranking.find((rank) => rank.team.id === myTeamId);
+            if (rank) {
+                for (const dataset of json.graph_datasets) {
+                    if (!dataset.label.startsWith(rank.team.name)) {
+                        continue;
+                    }
+                    dataset.borderColor = flipAlpha(dataset.borderColor);
+                    dataset.backgroundColor = flipAlpha(dataset.backgroundColor);
+                    dataset.borderWidth = 2;
+                }
+            }
+
+
             let ctx = document.getElementById('myChart').getContext('2d');
 
             let config = {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: json.graph_datasets
-                },
-                options: {
-                    responsiveAnimationDuration: 0,
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        mode: 'nearest'
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        animationDuration: 0
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 5
-                        },
-                        onClick: function(e, legendItem) {
-                            let meta = config.data.datasets[legendItem.datasetIndex];
-                            meta.backgroundColor = flipAlpha(meta.backgroundColor);
-                            meta.borderColor = flipAlpha(meta.borderColor);
+				type: 'line',
+				data: {
+					datasets: json.graph_datasets,
+				},
+				options: {
+					animation: false,
+					transitions: {
+						resize: {
+							animation: {
+								duration: 0,
+							},
+						},
+						active: {
+							animation: {
+								duration: 0,
+							},
+						},
+					},
+					hover: {
+						mode: 'nearest',
+						axis: 'r',
+					},
+					scales: {
+						x: {
+							title: {
+								display: false,
+								text: '時間',
+								font: {
+									size: 10,
+								},
+							},
+							type: 'time',
+							time: {
+								parser: 'yyyy-MM-dd HH:mm:ss',
+								tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+								displayFormats: {
+									millisecond: 'HH:mm:ss',
+									second: 'HH:mm:ss',
+									minute: 'HH:mm',
+									hour: 'MM-dd HH:mm',
+									day: 'MM-dd',
+									week: 'MM-dd',
+									month: 'yyyy-MM',
+									quarter: 'yyyy-MM',
+									year: 'yyyy',
+								},
+							},
+							min: json.graph_min,
+							max: json.graph_max,
+							ticks: {
+								source: 'auto',
+							},
+						},
+						y: {
+							title: {
+								display: false,
+								text: 'スコア',
+								font: {
+									size: 10,
+								},
+							},
+							ticks: {
+								format: {
+									style: 'decimal',
+								},
+							},
+							beginAtZero: true,
+							min: 0,
+						},
+					},
+					onClick: function (e) {
+						const chart = window.myChart;
+						if (!chart) return;
+						const points = chart.getElementsAtEventForMode(
+							e,
+							'nearest',
+							{},
+							false,
+						);
 
-                            window.myChart.update();
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: "時間",
-                                fontSize: 10
-                            },
-                            type: 'time',
-                            time: {
-                                parser: "YYYY-MM-DD HH:mm:ss",
-                                min: json.graph_min,
-                                max: json.graph_max
-                            }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: "スコア",
-                                fontSize: 10
-                            },
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    },
-                    onClick: function(e) {
-                        let activePoints = window.myChart.getElementAtEvent(e);
-                        if (Object.keys(activePoints).length > 0) {
-                            let valueIdx = activePoints[0]._datasetIndex;
-                            let meta = config.data.datasets[valueIdx];
-                            meta.backgroundColor = flipAlpha(meta.backgroundColor);
-                            meta.borderColor = flipAlpha(meta.borderColor);
-
-                            window.myChart.update();
-                        }
-                    }
-                }
-            };
+						for (const point of points ?? []) {
+							const meta = config.data.datasets[point.datasetIndex];
+							meta.backgroundColor = flipAlpha(meta.backgroundColor);
+							meta.borderColor = flipAlpha(meta.borderColor);
+							chart.update();
+						}
+					},
+					datasets: {
+						line: {
+							stepped: true,
+						},
+					},
+					plugins: {
+						tooltip: {
+							mode: 'nearest',
+							intersect: false,
+							animation: false,
+						},
+						legend: {
+							display: false,
+						},
+					},
+				},
+			};
             window.myChart = new Chart(ctx, config);
         })
         .catch((err) => {
