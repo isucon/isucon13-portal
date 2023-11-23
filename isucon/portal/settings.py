@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'isucon.portal.contest',
     # 'isucon.portal.contest.staff',
     'isucon.portal.contest.result',
+    'isucon.portal.contest.contact',
 ]
 
 MIDDLEWARE = [
