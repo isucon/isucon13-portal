@@ -27,6 +27,7 @@ class Command(BaseCommand):
             self.tver,
             self.wantedly,
             self.line_yahoo,
+            self.sakura,
         ]
 
         for func in funcs:
@@ -251,3 +252,20 @@ class Command(BaseCommand):
             self.print_score(score)
         except IndexError:
             print("該当なし")
+
+
+    def sakura(self):
+        """
+        さくらインターネット
+        
+        成功したベンチマークのうち、最もDNSの名前解決成功数が多かったチーム
+        """
+
+        print("さくらインターネット (成功したベンチマークのうち、最もDNSの名前解決成功数が多かったチーム)")
+        try:
+            job = Job.objects.filter(is_test=False, is_passed=True, is_active=True).order_by("-resolved_count")[0]
+            score = Score.objects.get(team=job.team)
+            self.print_score(score, "{}回".format(job.resolved_count))
+        except IndexError:
+            print("該当なし")
+
