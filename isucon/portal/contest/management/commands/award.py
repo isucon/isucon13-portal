@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
 
     def print_score(self, score, note=""):
-        print(score.team, ":", score.latest_score, "点", note)
+        print(score.team, ":", score.latest_score, "点", note, score.language)
 
 
     def iiseikatsu(self):

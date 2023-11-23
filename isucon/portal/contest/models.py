@@ -157,6 +157,7 @@ class Job(models.Model):
     reason = models.TextField("結果メッセージ", blank=True)
     score = models.IntegerField("獲得スコア", default=0, null=False)
     resolved_count = models.IntegerField("名前解決成功数", default=0, null=False)
+    language = models.CharField("実装言語", max_length=100, blank=True, default="")
 
     # ベタテキスト
     stdout = models.TextField("ログ標準出力", blank=True)
@@ -257,6 +258,8 @@ class Score(LogicalDeleteMixin, models.Model):
     test_scored_at = models.DateTimeField('テストスコア日時', blank=True, null=True)
     test_is_passed = models.BooleanField('テストベンチマーク成否フラグ', default=False, blank=True)
 
+    language = models.CharField("実装言語", max_length=100, blank=True, default="")
+
     objects = ScoreManager()
 
     def update(self):
@@ -271,6 +274,7 @@ class Score(LogicalDeleteMixin, models.Model):
             self.latest_score = latest_job.score
             self.latest_scored_at = latest_job.finished_at
             self.latest_is_passed = latest_job.is_passed
+            self.language = latest_job.language
         except IndexError:
             self.latest_score = 0
             self.latest_scored_at = None
