@@ -221,11 +221,11 @@ TEAM_MODIFY_END_AT = portal_utils.get_jst_datetime(2023, 10, 31, 16, 0, 0)
 
 # コンテスト開催期間
 # 日付
-CONTEST_DATE = datetime.date(2023, 11, 22)
+CONTEST_DATE = datetime.date(2023, 11, 23)
 
 # 時刻
-CONTEST_START_TIME = portal_utils.get_jst_time(3, 0, 0)
-CONTEST_END_TIME = portal_utils.get_jst_time(20, 0, 0)
+CONTEST_START_TIME = portal_utils.get_jst_time(10, 0, 0)
+CONTEST_END_TIME = portal_utils.get_jst_time(18, 0, 0)
 
 # Result
 SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 30, 22, 0, 0)
