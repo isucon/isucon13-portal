@@ -229,6 +229,10 @@ def get_graph_data():
     graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) - datetime.timedelta(hours=1)
     graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
 
+    if settings.SHOW_RESULT_AFTER < timezone.now():
+        graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) + datetime.timedelta(hours=1)
+        graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
+
     for team in Team.objects.filter(is_active=True):
         team_graph_data = TeamGraphData(team)
         for job in Job.objects.filter(status=Job.DONE, team=team, finished_at__lt=graph_end_at).order_by('finished_at').select_related("team"):
@@ -282,7 +286,7 @@ def graph(request):
         'graph_datasets': graph_datasets,
         "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
         "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
-        "ranking": ranking if timezone.now() < graph_end_at else None,
+        "ranking": ranking if (timezone.now() < graph_end_at or settings.SHOW_RESULT_AFTER < timezone.now()) else None,
     }
 
     return JsonResponse(
