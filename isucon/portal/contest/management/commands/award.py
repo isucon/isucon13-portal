@@ -205,6 +205,8 @@ class Command(BaseCommand):
         ランキングが隠れてから、最終結果のスコアが一番上がったチーム
         """
 
+        print("Wantedly (ランキングが隠れてから、最終結果のスコアが一番上がったチーム)")
+
         target_score = None
         target_score_diff = 0
 
