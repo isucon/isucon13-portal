@@ -161,14 +161,6 @@ def delete_server(request, pk):
 
     server = get_object_or_404(Server.objects.of_team(request.user.team), pk=pk)
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-
-    if server.is_bench_target:
-        messages.warning(request, "ベンチマーク対象のサーバは削除できません")
-        if is_ajax:
-            print("ajax error")
-            return HttpResponse("Error")
-        return redirect("servers")
-
     server.delete()
 
     if is_ajax:
