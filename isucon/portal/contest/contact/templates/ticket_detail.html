@@ -1,0 +1,122 @@
+{% extends "include/layout.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+
+
+<div class="column is-9">
+    <!-- back to lists -->
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{% url 'ticket_list' %}">Ticket</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Ticket Detail</a></li>
+        </ul>
+    </nav>
+
+    
+    <section class="table-list">
+        <div class="card events-card">
+            <header class="card-header is-dark">
+                <p class="card-header-title">
+                    <span class="icon">
+                        <i class="fas fa-list-alt"></i>
+                    </span>
+                    <span>Ticket #{{ ticket.id }}</span>
+                </p>
+            </header>
+            <div class="card-table">
+                <div class="content">
+                    <table class="table is-fullwidth is-striped">
+                        <tbody>
+                            <tr>
+                                <th width="10%">TicketID</th>
+                                <td>{{ ticket.id }}</td>
+                            </tr>
+                            <tr>
+                                <th width="10%">Title</th>
+                                <td>{{ ticket.title }}</td>
+                            </tr>
+                            <tr>
+                                <th width="10%">Owner</th>
+                                <td>{{ ticket.owner }}</td>
+                            </tr>
+                            <tr>
+                                <th width="10%">Status</th>
+                                <td>{{ ticket.get_status_display }}</td>
+                            </tr>
+                            <tr>
+                                <th width="10%">CreatedAt</th>
+                                <td>{{ ticket.created_at }}</td>
+                            </tr>
+                            <tr>
+                                <th width="10%">Description</th>
+                                <td>{{ ticket.description | linebreaksbr }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <h2 style="font-size: 1.3em; margin-top: 3em;">Comments (Newest)</h2>
+
+    <section style="display: flex; flex-direction: column; gap: 30px">
+        {% for comment in comments %}
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    {% if comment.owner.is_staff %}
+                    <span class="icon">
+                        <i class="fas fa-user-shield"></i>
+                    </span>
+                    ISUCON運営 ({{ comment.created_at }})
+                    {% else %}
+                        {{ comment.owner }} ({{ comment.created_at }})    
+                    {% endif %}
+                </p>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    {{ comment.description | linebreaksbr }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    {% if not ticket.is_closed %}
+
+    <h2 style="font-size: 1.3em; margin-top: 3em;">New Comments</h2>
+    <form method="post" action="{% url 'ticket_detail' ticket.id %}" style="margin-bottom: 3em;">
+        {% csrf_token %}
+        <div class="">
+            {{ form.as_p }}
+        </div>
+        <div class="is-grouped" style="margin-top: 1em;">
+            <div class="control">
+                <button class="button is-link" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="post" action="{% url 'ticket_close' ticket.id %}" style="margin-bottom: 3em;">
+        {% csrf_token %}
+        <div class="is-grouped" style="margin-top: 1em;">
+            <div class="control">
+                <button class="button is-warning" type="submit">解決済みにする</button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+
+
+</div>
+
+{% endblock content %}
+
+{% block script %}
+{% endblock script %}
