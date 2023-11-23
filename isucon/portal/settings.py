@@ -30,6 +30,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+IPWARE_META_PRECEDENCE_ORDER = (
+    'HTTP_X_FORWARDED_FOR', 'X_FORWARDED_FOR',  # <client>, <proxy1>, <proxy2>
+    'HTTP_CLIENT_IP',
+    'HTTP_X_REAL_IP',
+    'HTTP_X_FORWARDED',
+    'HTTP_X_CLUSTER_CLIENT_IP',
+    'HTTP_FORWARDED_FOR',
+    'HTTP_FORWARDED',
+    'HTTP_VIA',
+    'REMOTE_ADDR',
+)
 
 # Application definition
 
@@ -49,9 +60,9 @@ INSTALLED_APPS = [
     'isucon.portal',
     'isucon.portal.authentication',
     'isucon.portal.envcheck',
-    # 'isucon.portal.contest',
+    'isucon.portal.contest',
     # 'isucon.portal.contest.staff',
-    # 'isucon.portal.contest.result',
+    'isucon.portal.contest.result',
 ]
 
 MIDDLEWARE = [
@@ -194,6 +205,14 @@ AWS_ACCESS_KEY_ID = "AKIAWFVKEZX5PTZOKL36"
 AWS_SECRET_ACCESS_KEY = "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"
 AWS_STORAGE_BUCKET_NAME = "isucon13-portal-dev"
 
+SQS_JOB_URLS = {
+    "apne1-az1": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az1.fifo",
+    "apne1-az2": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az2.fifo",
+    "apne1-az4": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az4.fifo",
+}
+
+SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-result"
+
 
 # 登録期間
 REGISTRATION_START_AT = portal_utils.get_jst_datetime(2023, 8, 1, 10, 0, 0)
@@ -202,14 +221,14 @@ TEAM_MODIFY_END_AT = portal_utils.get_jst_datetime(2023, 10, 31, 16, 0, 0)
 
 # コンテスト開催期間
 # 日付
-CONTEST_DATE = datetime.date(2023, 11, 25)
+CONTEST_DATE = datetime.date(2023, 11, 23)
 
 # 時刻
 CONTEST_START_TIME = portal_utils.get_jst_time(10, 0, 0)
-CONTEST_END_TIME = portal_utils.get_jst_time(18, 0, 0)
+CONTEST_END_TIME = portal_utils.get_jst_time(17, 0, 0)
 
 # Result
-SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 30, 22, 0, 0)
+SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 23, 18, 0, 0)
 
 # Github認証に使うトークン
 # TODO: 入れ替える
@@ -232,6 +251,9 @@ BENCHMARK_ABORT_TIMEOUT_SEC = 300
 ENVCHECK_AMI_ID = "ami-04a7c0e0153437272"
 ENVCHECK_AZ_ID = "apne1-az1"
 ENVCHECK_DEVELOP = True
+
+CONTEST_AMI_ID = "ami-058c0eeb4f389dc6f"
+
 
 # チームに所属できる最大人数
 MAX_TEAM_MEMBER_NUM = 3

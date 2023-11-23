@@ -87,8 +87,8 @@ class TeamGraphData:
             hoverBorderColor=self.hover_color,
             pointHoverBorderWidth=5,
             lineTension=0,
-            borderWidth=2,
-            pointRadius=3,
+            borderWidth=1,
+            pointRadius=2,
             fill=False,
             spanGaps=True,
         )

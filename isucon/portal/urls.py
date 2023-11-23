@@ -25,7 +25,7 @@ urlpatterns = [
     path('dashboard/', views.index, name='dashboard'),  # 暫定
     path('auth/', include("isucon.portal.authentication.urls")),
     path('envcheck/', include("isucon.portal.envcheck.urls")),
-    # path('contest/', include("isucon.portal.contest.urls")),
+    path('contest/', include("isucon.portal.contest.urls")),
     # path('internal/', include("isucon.portal.internal.urls")),
     path('admin/', admin.site.urls),
     path('', include('social_django.urls', namespace='social')),

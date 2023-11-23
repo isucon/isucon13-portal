@@ -4,15 +4,14 @@ from django import forms
 from isucon.portal.contest.models import (
     Server,
     Information,
-    Benchmarker,
     Score,
     Job
 )
 
 
 class ServerAdmin(admin.ModelAdmin):
-    list_display = ["id", "hostname", "global_ip", "private_ip"]
-    list_filter = ["hostname"]
+    list_display = ["id", "team", "global_ip", "private_ip", "is_checked"]
+    list_filter = ["team", "is_checked"]
 
 admin.site.register(Server, ServerAdmin)
 
@@ -32,22 +31,15 @@ class InformationAdmin(admin.ModelAdmin):
 admin.site.register(Information, InformationAdmin)
 
 
-class BenchmarkerAdmin(admin.ModelAdmin):
-    list_display = ["id", "ip"]
-    list_filter = ["ip"]
-
-admin.site.register(Benchmarker, BenchmarkerAdmin)
-
-
 class ScoreAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "best_score", "latest_score", "latest_is_passed"]
-    list_filter = ["latest_is_passed"]
+    list_display = ["id", "team", "best_score", "latest_score", "latest_is_passed", "test_score", "test_is_passed"]
+    list_filter = ["latest_is_passed", "test_is_passed"]
 
 admin.site.register(Score, ScoreAdmin)
 
 class JobAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "status", "target", "benchmarker", "is_passed", "score", "reason_short"]
-    list_filter = ["status", "is_passed", "team"]
+    list_display = ["id", "team", "status", "target", "is_active", "is_test", "is_passed", "score", "reason_short"]
+    list_filter = ["status", "is_passed", "is_test", "is_active", "team"]
 
     def reason_short(self, instance):
         line = instance.reason.split("\n")[0]

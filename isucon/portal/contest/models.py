@@ -1,24 +1,20 @@
 import datetime
 import json
+import boto3
 
 from django.db import models
-from django.db.models import Max, Sum
 from django.forms.models import model_to_dict
 from django.utils import timezone
 
 from isucon.portal import settings
-from isucon.portal.models import LogicalDeleteMixin, CommaSeparatedDateField
+from isucon.portal.models import LogicalDeleteMixin
 from isucon.portal.contest import exceptions
 
-# FIXME: ベンチマーク対象のサーバを変更する機能
-# https://github.com/isucon/isucon8-final/blob/d1480128c917f3fe4d87cb84c83fa2a34ca58d39/portal/lib/ISUCON13/Portal/Web/Controller/API.pm#L32
 
 class InformatioManager(models.Manager):
 
     def of_team(self, team):
         return self.get_queryset().filter(is_enabled=True)
-
-
 
 class Information(LogicalDeleteMixin, models.Model):
     class Meta:
@@ -30,17 +26,6 @@ class Information(LogicalDeleteMixin, models.Model):
     is_enabled = models.BooleanField("表示", blank=True)
 
     objects = InformatioManager()
-
-class Benchmarker(LogicalDeleteMixin, models.Model):
-    class Meta:
-        verbose_name = verbose_name_plural = "ベンチマーカー"
-
-    # TODO: ベンチマーカーを管理する上で必要な情報を追加
-    ip = models.CharField("ベンチマーカーのIPアドレス", max_length=100)
-
-    def __str__(self):
-        return self.ip
-
 
 class ServerManager(models.Manager):
 
@@ -73,6 +58,8 @@ class Server(LogicalDeleteMixin, models.Model):
 
     is_bench_target = models.BooleanField("ベンチマークターゲットであるかのフラグ", default=False)
 
+    is_checked = models.BooleanField("チェック済み", default=True, blank=True)
+
     objects = ServerManager()
 
     def set_bench_target(self):
@@ -91,42 +78,28 @@ class Server(LogicalDeleteMixin, models.Model):
 class JobManager(models.Manager):
 
     def of_team(self, team):
-        return self.get_queryset().filter(team=team)
+        # 閲覧可能なチームのJob
+        return self.get_queryset().filter(team=team, is_active=True, is_test=False)
 
     def get_latest_score(self, team):
         """指定チームの最新スコアを取得"""
         # NOTE: orderingにより最新順に並んでいるので、LIMITで取れば良い
-        return self.of_team(team).filter(status=Job.DONE).order_by('-finished_at').first()
+        return self.of_team(team).filter(status=Job.DONE, is_active=True, is_test=False).order_by('-finished_at').first()
 
-    def enqueue(self, team):
+    def enqueue(self, team, is_test=False):
         # 重複チェック
         if self.check_duplicated(team):
             raise exceptions.DuplicateJobError
 
         # 追加
         job = self.model(team=team)
-        job.save(using=self._db)
-
-        return job
-
-    def dequeue(self, benchmarker=None):
-        if benchmarker is not None:
-            # ベンチマーカーが自身にひもづくチームのサーバにベンチマークを行う場合
-            # 報告したベンチマーカの紐づいているチーム、かつWAITING状態のジョブを取得
-            queryset = self.get_queryset().select_for_update().filter(status=Job.WAITING, team__benchmarker=benchmarker)
-        else:
-            # ベンチマーカーが割り当てられてないチームのベンチマークを行う場合
-            queryset = self.get_queryset().select_for_update().filter(status=Job.WAITING, team__benchmarker__isnull=True)
-
-        job = queryset.order_by("created_at").first()
-        if job is None:
-            raise exceptions.JobDoesNotExistError
-
-        # 状態を処理中にする
-        job.status = Job.RUNNING
-        job.target = Server.objects.get(team=job.team, is_bench_target=True)
+        job.target = Server.objects.get_bench_target(team)
         job.target_ip = job.target.global_ip
+        job.is_test = is_test
         job.save(using=self._db)
+
+        # SQSに送信
+        job.send_to_queue()
 
         return job
 
@@ -137,7 +110,7 @@ class JobManager(models.Manager):
         deadline = timezone.now() - datetime.timedelta(seconds=timeout_sec)
 
         # タイムアウトした(=締め切りより更新時刻が古い) ジョブを aborted にしていく
-        jobs = Job.objects.filter(status=Job.RUNNING, updated_at__lt=deadline)
+        jobs = Job.objects.filter(status__in=[Job.RUNNING, Job.WAITING], updated_at__lt=deadline)
         for job in jobs:
             job.abort(reason="Benchmark timeout", stdout='', stderr='')
 
@@ -174,11 +147,12 @@ class Job(models.Model):
     team = models.ForeignKey('authentication.Team', verbose_name="チーム", on_delete=models.CASCADE)
     target = models.ForeignKey('Server', verbose_name="対象サーバ", blank=True, null=True, on_delete=models.SET_NULL)
     target_ip = models.CharField("対象サーバIPアドレス", blank=True, max_length=100)
-    benchmarker = models.ForeignKey('Benchmarker', verbose_name="ベンチマーカ", blank=True, null=True, on_delete=models.SET_NULL)
 
     # Choice系
     status = models.CharField("進捗", max_length=100, choices=STATUS_CHOICES, default=WAITING)
-    is_passed = models.BooleanField("正答フラグ", default=False)
+    is_passed = models.BooleanField("正答フラグ", default=False, blank=True)
+    is_active = models.BooleanField("有効かどうか", default=True, blank=True)
+    is_test = models.BooleanField("テストかどうか", default=False, blank=True)
 
     reason = models.TextField("結果メッセージ", blank=True)
     score = models.IntegerField("獲得スコア", default=0, null=False)
@@ -221,19 +195,24 @@ class Job(models.Model):
         except:
             pass
         return {}
-
-    def done(self, score, is_passed, stdout, stderr, reason, status=DONE):
-        # ベンチマークが終了したらログを書き込む
-        self.stdout = stdout
-        self.stderr = stderr
-
-        self.score = score
-        self.is_passed = is_passed
-        self.status = status
-
-        self.reason = reason
-        self.finished_at = timezone.now()
-        self.save()
+    
+    def send_to_queue(self):
+        data = {
+            "id": self.id,
+            "action": "benchmark",
+            "team": self.team_id,
+            "target_ip": self.target_ip,
+            "is_test": self.is_test,
+            "servers":[s.global_ip for s in Server.objects.of_team(self.team)],
+        }
+        sqs_client = boto3.client("sqs")
+        response = sqs_client.send_message(
+            QueueUrl=settings.SQS_JOB_URLS[self.team.aws_az],
+            MessageBody=json.dumps(data),
+            MessageGroupId=self.team.aws_az,
+            MessageDeduplicationId=str(self.id),
+        )
+        print(data, response)
 
     def abort(self, reason, stdout, stderr):
         self.status = Job.ABORTED
@@ -246,6 +225,13 @@ class Job(models.Model):
 
 class ScoreManager(models.Manager):
 
+    def active(self):
+        return self.get_queryset().filter(
+            team__is_active=True,
+        ).filter(
+            latest_is_passed=True, test_is_passed=True,
+        )
+
     def passed(self):
         return self.get_queryset().filter(latest_is_passed=True)
 
@@ -253,7 +239,7 @@ class ScoreManager(models.Manager):
         return self.get_queryset().filter(latest_is_passed=False)
 
 
-# NOTE: Scoreは、Django signals を用いることで、チーム登録時に作成され、得点履歴が追加されるごとに更新されます
+# NOTE: Scoreは、チーム毎に作成され、Django signals を用いることで、得点履歴が追加されるごとに更新されます
 class Score(LogicalDeleteMixin, models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チームスコア"
@@ -266,22 +252,43 @@ class Score(LogicalDeleteMixin, models.Model):
     latest_scored_at = models.DateTimeField('最新スコア日時', blank=True, null=True)
     latest_is_passed = models.BooleanField('最新のベンチマーク成否フラグ', default=False, blank=True)
 
+    test_score = models.IntegerField('テストスコア', null=True, blank=True)
+    test_scored_at = models.DateTimeField('テストスコア日時', blank=True, null=True)
+    test_is_passed = models.BooleanField('テストベンチマーク成否フラグ', default=False, blank=True)
+
     objects = ScoreManager()
 
     def update(self):
         """Jobから再計算します"""
+
+        job_queryset = Job.objects.filter(team=self.team, status=Job.DONE, is_test=False, is_active=True)
+        test_job_queryset = Job.objects.filter(team=self.team, status=Job.DONE, is_test=True, is_active=True)
+
+        # 本番スコア
         try:
-            latest_job = Job.objects.filter(team=self.team, status=Job.DONE).order_by("-finished_at")[0]
+            latest_job = job_queryset.order_by("-finished_at")[0]
             self.latest_score = latest_job.score
             self.latest_scored_at = latest_job.finished_at
             self.latest_is_passed = latest_job.is_passed
         except IndexError:
-            pass
+            self.latest_score = 0
+            self.latest_scored_at = None
+            self.latest_is_passed = False
 
         try:
-            best_score_job = Job.objects.filter(team=self.team, status=Job.DONE, is_passed=True).order_by("-score")[0]
+            best_score_job = job_queryset.filter(is_passed=True).order_by("-score")[0]
             self.best_score = best_score_job.score
             self.best_scored_at = best_score_job.finished_at
+        except IndexError:
+            self.best_score = 0
+            self.best_scored_at = None
+
+        # テストスコア
+        try:
+            latest_job = test_job_queryset.order_by("-finished_at")[0]
+            self.test_score = latest_job.score
+            self.test_scored_at = latest_job.finished_at
+            self.test_is_passed = latest_job.is_passed
         except IndexError:
             pass
 

@@ -83,6 +83,7 @@ def create_team(request):
         user = request.user
         initial = {
             "email": user.email,
+            "want_local_participation": False,
         }
         form = TeamRegisterForm(request.POST or None, request.FILES or None, user=user, coupon=coupon, initial=initial)
         if request.method != "POST" or not form.is_valid():

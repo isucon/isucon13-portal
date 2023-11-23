@@ -1,22 +1,24 @@
+import base64
+import json
 import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponseNotAllowed, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.utils import timezone
+from django.db.models import F, OuterRef, Func, Subquery
 
 from isucon.portal import utils as portal_utils
 from isucon.portal.authentication.decorators import team_is_authenticated
-from isucon.portal.authentication.models import Team
+from isucon.portal.authentication.models import Team, User
 from isucon.portal.contest.decorators import team_is_now_on_contest
 from isucon.portal.contest.models import Server, Job, Score
-from isucon.portal.contest.exceptions import TeamScoreDoesNotExistError
+from isucon.portal.contest.redis.color import iter_colors
+from isucon.portal.contest.redis.client import TeamGraphData
 
-from isucon.portal.contest.forms import TeamForm, UserForm, ServerTargetForm, UserIconForm, ServerAddForm
-from isucon.portal.contest.redis.client import RedisClient
-
+from isucon.portal.contest.forms import ServerTargetForm
 
 def get_base_context(user):
     try:
@@ -40,7 +42,7 @@ def dashboard(request):
     context = get_base_context(request.user)
 
     recent_jobs = Job.objects.of_team(team=request.user.team).order_by("-created_at")[:10]
-    top_teams = Score.objects.passed().filter(team__participate_at=request.user.team.participate_at).select_related("team")[:30]
+    top_teams = Score.objects.passed().select_related("team")[:30]
 
     # チームのスコアを取得
     try:
@@ -121,8 +123,8 @@ def scores(request):
     context = get_base_context(request.user)
 
     context.update({
-        "passed": Score.objects.passed().filter(team__participate_at=request.user.team.participate_at).select_related("team"),
-        "failed": Score.objects.failed().filter(team__participate_at=request.user.team.participate_at).select_related("team"),
+        "passed": Score.objects.passed().select_related("team"),
+        "failed": Score.objects.failed().select_related("team"),
     })
 
     return render(request, "scores.html", context)
@@ -132,7 +134,6 @@ def scores(request):
 def servers(request):
     context = get_base_context(request.user)
     servers = Server.objects.of_team(request.user.team)
-    add_form = ServerAddForm(team=request.user.team)
 
     if request.method == "POST":
         action = request.POST.get("action", "").lower()
@@ -146,16 +147,8 @@ def servers(request):
                 messages.success(request, "ベンチマーク対象のサーバを変更しました")
                 return redirect("servers")
 
-        if action == "add":
-            add_form = ServerAddForm(request.POST, team=request.user.team)
-            if add_form.is_valid():
-                add_form.save()
-                messages.success(request, "サーバを追加しました")
-                return redirect("servers")
-
     context.update({
         "servers": servers,
-        "add_form": add_form
     })
     return render(request, "servers.html", context)
 
@@ -167,19 +160,11 @@ def delete_server(request, pk):
         return HttpResponseNotAllowed(["DELETE"])
 
     server = get_object_or_404(Server.objects.of_team(request.user.team), pk=pk)
-
-    if server.is_bench_target:
-        messages.warning(request, "ベンチマーク対象のサーバは削除できません")
-        if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return HttpResponse("Error")
-        return redirect("servers")
-
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     server.delete()
 
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse(
-            {}, status = 200
-        )
+    if is_ajax:
+        return JsonResponse({}, status=200)
 
     messages.success(request, "サーバを削除しました")
     return redirect("servers")
@@ -187,9 +172,37 @@ def delete_server(request, pk):
 
 @team_is_authenticated
 @team_is_now_on_contest
+def cloudformation_contest(request):
+    team = request.user.team
+
+    authorized_keys = []
+    for user in User.objects.filter(team=team):
+        authorized_keys.append(user.authorized_keys)
+    authorized_keys = "\n".join(authorized_keys)
+
+    portal_credentials = {
+        "dev": False,
+        "token": team.envcheck_token,
+        "host": request.META.get("HTTP_HOST"),
+    }
+
+    context = {
+        "az_id": team.aws_az,
+        "ami_id": settings.CONTEST_AMI_ID,
+        "authorized_keys": base64.b64encode(authorized_keys.encode("utf-8")).decode("ascii"),
+        "portal_credentials": base64.b64encode(json.dumps(portal_credentials).encode("utf-8")).decode("ascii"),
+    }
+
+    response = render(request, "cloudformation_contest.yaml", context)
+    response['Content-Disposition'] = 'attachment; filename="cloudformation_contest.yaml"'
+    return response
+
+
+@team_is_authenticated
+@team_is_now_on_contest
 def teams(request):
 
-    teams = Team.objects.filter(participate_at=request.user.team.participate_at).order_by('id').all()
+    teams = Team.objects.order_by('id').all()
 
     paginator = Paginator(teams, 100)
 
@@ -207,28 +220,80 @@ def teams(request):
     return render(request, "teams.html", context)
 
 
-@team_is_authenticated
-@team_is_now_on_contest
+
+def get_graph_data():
+    color_iterator = iter_colors()
+    datasets = []
+
+    # NOTE: 最後の1時間のデータは含まない
+    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) - datetime.timedelta(hours=1)
+    graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
+
+    if settings.SHOW_RESULT_AFTER < timezone.now():
+        graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) + datetime.timedelta(hours=1)
+        graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
+
+    for team in Team.objects.filter(is_active=True):
+        team_graph_data = TeamGraphData(team)
+        for job in Job.objects.filter(status=Job.DONE, team=team, finished_at__lt=graph_end_at).order_by('finished_at').select_related("team"):
+            team_graph_data.append(job)
+
+        # グラフの彩色
+        color, hover_color = next(color_iterator)
+        team_graph_data.assign_color(color, hover_color)
+
+        # 全てのグラフデータを取得
+        datasets.append(team_graph_data.to_dict(partial=False))
+
+    return datasets
+
+
 def graph(request):
-    if not request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return HttpResponse("このエンドポイントはAjax専用です", status=400)
+    # NOTE: CONTEST_START_TIME-10minutes ~ CONTEST_END_TIME+10minutes にするようにmin, maxを渡す
+    graph_start_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_START_TIME) - datetime.timedelta(minutes=10)
+    graph_start_at = graph_start_at.replace(tzinfo=portal_utils.jst)
 
-    context = get_base_context(request.user)
-    team = request.user.team
+    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) + datetime.timedelta(minutes=10)
+    graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
 
-    ranking = [row["team__id"] for row in
-                    Score.objects.passed().filter(team__participate_at=team.participate_at).values("team__id")[:settings.RANKING_TOPN]]
+    graph_datasets = get_graph_data()
 
-    client = RedisClient()
-    graph_datasets, graph_min, graph_max = client.get_graph_data(team, ranking, is_last_spurt=context['is_last_spurt'])
+    # ランキング情報
 
+    student_count_subquery = User.objects.filter(
+        team_id=OuterRef("team_id"), 
+        is_student=True,
+    ).order_by().annotate(student_count=Func(F('id'), function='Count')).values('student_count')
+
+    scores = Score.objects.annotate(
+            student_count=Subquery(student_count_subquery),
+    ).filter(team__is_active=True).select_related("team").order_by("-latest_score")
+
+
+    ranking = [
+        {
+            "team": {
+                "id": score.team.id,
+                "name": score.team.name,
+                "has_student": score.student_count > 0,
+                "is_guest": score.team.is_guest,
+            },
+            "latest_score": score.latest_score,
+            "rank": rank,
+        } for rank, score in enumerate(scores, start=1)
+    ]
     data = {
         'graph_datasets': graph_datasets,
-        'graph_min': graph_min,
-        'graph_max': graph_max,
+        "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
+        "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
+        "ranking": ranking if (timezone.now() < graph_end_at or settings.SHOW_RESULT_AFTER < timezone.now()) else None,
     }
 
     return JsonResponse(
-        data, status = 200
+        data,
+        status=200,
+        headers={
+            "Cache-Control": "public, max-age=60, s-maxage=60",
+        },
     )
 

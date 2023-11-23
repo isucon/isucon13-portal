@@ -12,13 +12,6 @@ __all__ = ("create_score", "update_score", "set_default_benchmark_target_server"
 
 logger = logging.getLogger('isucon.portal.contest.signals')
 
-@receiver(post_save, sender=Team)
-def create_score(sender, instance, created, **kwargs):
-    """チームが変更されたら、デフォルトの `Score` を作成する"""
-    if not Score.objects.filter(team=instance).exists():
-        # スコア作成
-        score = Score.objects.create(team=instance)
-
 @receiver(post_save, sender=Job)
 def update_score(sender, instance, created, **kwargs):
     """Jobが更新されたら、集計スコアを更新する"""
@@ -30,17 +23,17 @@ def update_score(sender, instance, created, **kwargs):
 
     if not Score.objects.filter(team=instance.team).exists():
         # 念のためなかったら作る
-        score = Score.objects.create(team=instance)
+        score = Score.objects.create(team=instance.team)
     else:
         score = instance.team.score
 
     score.update()
 
-@receiver(post_save, sender=Job)
-def update_redis_cache(sender, instance, created, **kwargs):
-    if instance.status == Job.DONE:
-        client = RedisClient()
-        client.update_team_cache(instance)
+# @receiver(post_save, sender=Job)
+# def update_redis_cache(sender, instance, created, **kwargs):
+#     if instance.status == Job.DONE:
+#         client = RedisClient()
+#         client.update_team_cache(instance)
 
 @receiver(post_save, sender=Server)
 def set_default_benchmark_target_server(sender, instance, created, **kwargs):

@@ -80,6 +80,8 @@ class TeamRegisterForm(forms.Form):
             "name": self.cleaned_data['name'],
             "password": password,
             "owner": user,
+            "want_local_participation": False,
+            "is_local_participation": False,
         }
         if self.coupon:
             team_data.update({

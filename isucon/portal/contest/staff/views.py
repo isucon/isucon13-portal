@@ -63,7 +63,7 @@ def dashboard(request):
     participate_at = get_participate_at(request)
     print("participate_at: type={}, value={}".format(type(participate_at), participate_at))
 
-    top_teams = Score.objects.passed().filter(team__participate_at=participate_at)[:30]
+    top_teams = Score.objects.passed()[:30]
 
     context.update({
         "top_teams": top_teams,
@@ -81,8 +81,8 @@ def scores(request):
     participate_at = get_participate_at(request)
 
     context.update({
-        "passed": Score.objects.passed().filter(team__participate_at=participate_at),
-        "failed": Score.objects.failed().filter(team__participate_at=participate_at),
+        "passed": Score.objects.passed(),
+        "failed": Score.objects.failed(),
     })
 
     return render(request, "staff/scores.html", context)
@@ -150,7 +150,7 @@ def graph(request):
     team = request.user.team
 
     ranking = [row["team__id"] for row in
-                    Score.objects.passed().filter(team__participate_at=team.participate_at).values("team__id")[:graph_teams]]
+                    Score.objects.passed().values("team__id")[:graph_teams]]
 
     client = RedisClient()
     graph_datasets, graph_min, graph_max = client.get_graph_data_for_staff(participate_at, ranking)
