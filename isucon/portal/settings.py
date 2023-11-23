@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'isucon.portal.envcheck',
     'isucon.portal.contest',
     # 'isucon.portal.contest.staff',
-    # 'isucon.portal.contest.result',
+    'isucon.portal.contest.result',
 ]
 
 MIDDLEWARE = [
@@ -228,7 +228,7 @@ CONTEST_START_TIME = portal_utils.get_jst_time(10, 0, 0)
 CONTEST_END_TIME = portal_utils.get_jst_time(17, 0, 0)
 
 # Result
-SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 30, 22, 0, 0)
+SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 22, 22, 0, 0)
 
 # Github認証に使うトークン
 # TODO: 入れ替える

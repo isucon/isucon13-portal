@@ -15,5 +15,5 @@ urlpatterns = [
     path('graph/', views.graph, name="graph"),
     # path('teams/', views.teams, name="teams"),
     # path('staff/', include("isucon.portal.contest.staff.urls")),
-    # path('result/', include("isucon.portal.contest.result.urls")),
+    path('result/', include("isucon.portal.contest.result.urls")),
 ]
