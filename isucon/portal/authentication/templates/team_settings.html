@@ -37,6 +37,7 @@
     </article>
     {% endif %}
 
+    {% comment %}
     <article class="message is-warning">
       <div class="message-body">
         現地参加の希望は
@@ -46,6 +47,7 @@
         変更を希望する場合は <a href="{% url "local_participation" %}">こちらから</a> 変更してください。
       </div>
     </article>
+    {% endcomment %}
 
 
     {% if not checnenv_is_done %}
