@@ -47,8 +47,9 @@ def save_result(request):
         if result.name == "contest-boot":
             if result.passed:
                 # サーバ登録する
+                client_addr, _ = get_client_ip(request)
+
                 if Server.objects.of_team(request.team).count() < 3:
-                    client_addr, _ = get_client_ip(request)
                     Server.objects.get_or_create(
                         team=request.team,
                         global_ip=client_addr,
@@ -57,5 +58,10 @@ def save_result(request):
                             private_ip=result.ip_address,
                         ),
                     )
+
+                Server.objects.filter(
+                    team=request.team,
+                    global_ip=client_addr,
+                ).update(is_checked=True)
 
     return HttpResponse(status=204)

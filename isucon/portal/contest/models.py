@@ -58,6 +58,8 @@ class Server(LogicalDeleteMixin, models.Model):
 
     is_bench_target = models.BooleanField("ベンチマークターゲットであるかのフラグ", default=False)
 
+    is_checked = models.BooleanField("チェック済み", default=True, blank=True)
+
     objects = ServerManager()
 
     def set_bench_target(self):
