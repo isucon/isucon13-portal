@@ -20,7 +20,8 @@ def ticket_list(request):
 @team_is_now_on_contest
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket.objects.filter(owner__team=request.user.team), pk=pk)
-    comments = ticket.ticketcomment_set.all()
+
+    form = TicketCommentForm()
 
     if request.method == "POST":
         form = TicketCommentForm(request.POST or None)
@@ -30,16 +31,29 @@ def ticket_detail(request, pk):
             comment.owner = request.user
             comment.save()
             ticket.updated_at = comment.created_at
+            if ticket.status == "waiting":
+                ticket.status = "progress"
             ticket.save()
-    
-    form = TicketCommentForm()
+            messages.success(request, "チケットにコメントを送信しました")
+            return redirect("ticket_detail", pk=ticket.pk)
 
+    comments = ticket.ticketcomment_set.all().order_by("-created_at")
     context = {
         "ticket": ticket,
         "comments": comments,
         "form": form,
     }
     return render(request, "ticket_detail.html", context)
+
+@team_is_authenticated
+@team_is_now_on_contest
+def ticket_close(request, pk):
+    ticket = get_object_or_404(Ticket.objects.filter(owner__team=request.user.team), pk=pk)
+    ticket.status = "closed"
+    ticket.save()
+    messages.success(request, "チケットを解決済みにしました")
+    return redirect("ticket_detail", pk=ticket.pk)
+
 
 @team_is_authenticated
 @team_is_now_on_contest

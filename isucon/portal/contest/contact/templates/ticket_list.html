@@ -25,7 +25,7 @@
         {% for ticket in tickets %}
             <tr>
                 <td class="has-text-right">{{ ticket.id }}</td>
-                <td class="">{{ ticket.status }}</td>
+                <td class="">{{ ticket.get_status_display }}</td>
                 <td class="">
                     <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
                 </td>

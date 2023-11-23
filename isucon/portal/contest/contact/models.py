@@ -26,6 +26,12 @@ class Ticket(models.Model):
     def is_recent(self):
         return self.created_at > timezone.now() - datetime.timedelta(minutes=10)
 
+    def is_closed(self):
+        if self.status == "closed":
+            return True
+        return False
+
+
 class TicketComment(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "チケットコメント"

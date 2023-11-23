@@ -44,11 +44,11 @@
                             </tr>
                             <tr>
                                 <th width="10%">Status</th>
-                                <td>{{ ticket.status }}</td>
+                                <td>{{ ticket.get_status_display }}</td>
                             </tr>
                             <tr>
                                 <th width="10%">CreatedAt</th>
-                                <td>{{ ticket.created_at  }}</td>
+                                <td>{{ ticket.created_at }}</td>
                             </tr>
                             <tr>
                                 <th width="10%">Description</th>
@@ -61,7 +61,7 @@
         </div>
     </section>
 
-    <h2 style="font-size: 1.3em; margin-top: 3em;">Comments</h2>
+    <h2 style="font-size: 1.3em; margin-top: 3em;">Comments (Newest)</h2>
 
     <section style="display: flex; flex-direction: column; gap: 30px">
         {% for comment in comments %}
@@ -75,7 +75,6 @@
                     ISUCON運営 ({{ comment.created_at }})
                     {% else %}
                         {{ comment.owner }} ({{ comment.created_at }})    
-
                     {% endif %}
                 </p>
             </header>
@@ -87,6 +86,8 @@
         </div>
         {% endfor %}
     </section>
+
+    {% if not ticket.is_closed %}
 
     <h2 style="font-size: 1.3em; margin-top: 3em;">New Comments</h2>
     <form method="post" action="{% url 'ticket_detail' ticket.id %}" style="margin-bottom: 3em;">
@@ -100,6 +101,17 @@
             </div>
         </div>
     </form>
+
+
+    <form method="post" action="{% url 'ticket_close' ticket.id %}" style="margin-bottom: 3em;">
+        {% csrf_token %}
+        <div class="is-grouped" style="margin-top: 1em;">
+            <div class="control">
+                <button class="button is-warning" type="submit">解決済みにする</button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
 
 
 </div>

@@ -26,6 +26,12 @@
             </span>
             <span>Show All Team Scores</span>
         </a>
+        <a class="{% if page == "ticket_list" %}active{% endif %}" href="{% url "ticket_list" %}">
+            <span class="icon">
+                <i class="fa-regular fa-envelope"></i>
+            </span>
+            <span>Contact</span>
+        </a>
     </li>
 </ul>
 {% endif %}
