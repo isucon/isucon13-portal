@@ -5,8 +5,8 @@ import boto3
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils import timezone
+from django.conf import settings
 
-from isucon.portal import settings
 from isucon.portal.models import LogicalDeleteMixin
 from isucon.portal.contest import exceptions
 
