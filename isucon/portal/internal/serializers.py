@@ -8,5 +8,5 @@ class JobResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ('id', 'status', 'score', 'is_passed', 'reason', 'stdout', 'stderr', 'finished_at')
+        fields = ('id', 'status', 'score', 'resolved_count', 'is_passed', 'reason', 'stdout', 'stderr', 'finished_at')
         read_only_fields = ('id', )

@@ -156,6 +156,7 @@ class Job(models.Model):
 
     reason = models.TextField("結果メッセージ", blank=True)
     score = models.IntegerField("獲得スコア", default=0, null=False)
+    resolved_count = models.IntegerField("名前解決成功数", default=0, null=False)
 
     # ベタテキスト
     stdout = models.TextField("ログ標準出力", blank=True)
