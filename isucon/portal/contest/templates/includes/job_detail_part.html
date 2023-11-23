@@ -1,7 +1,7 @@
 {% load humanize %}
 <div class="card-table">
     <div class="content">
-        <table class="table is-fullwidth is-striped">
+        <table class="table is-fullwidth is-striped" style="table-layout: fixed;">
             <tbody>
                 {% if staff %}
                   <tr>
@@ -68,7 +68,7 @@
                 <tr>
                     <th width="10%">Message</th>
                     <td>
-                        {{ job.reason|linebreaksbr }}
+                        <pre style="overflow-x: scroll; line-height: 1; padding: 10px;">{{ job.reason|linebreaksbr }}</pre>
                     </td>
                 </tr>
                 {% if staff %}
