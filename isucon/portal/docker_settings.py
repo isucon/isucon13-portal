@@ -79,12 +79,8 @@ REGISTRATION_END_AT = portal_utils.get_jst_datetime(2025, 9, 10, 9, 0, 0)
 MAX_TEAM_NUM = 20
 
 # AWS
-ENVCHECK_AMI_ID = "ami-04a7c0e0153437272"
 ENVCHECK_AZ_ID = "apne1-az1"
-ENVCHECK_DEVELOP = True
-
-CONTEST_AMI_ID = "ami-001e2fc2b4d547ed6"
-
+ENVCHECK_DEVELOP = False
 
 # アプリケーション固有設定
 
