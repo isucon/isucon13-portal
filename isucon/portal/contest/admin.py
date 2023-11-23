@@ -22,7 +22,6 @@ class InformationAdminForm(forms.ModelForm):
         fields = ["id", "is_enabled", "title", "description"]
 
 
-
 class InformationAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "is_enabled"]
     list_filter = ["is_enabled"]
@@ -37,8 +36,9 @@ class ScoreAdmin(admin.ModelAdmin):
 
 admin.site.register(Score, ScoreAdmin)
 
+
 class JobAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "status", "target", "is_active", "is_test", "is_passed", "score", "reason_short"]
+    list_display = ["id", "team", "status", "target", "is_active", "is_test", "is_passed", "score", "resolved_count", "reason_short"]
     list_filter = ["status", "is_passed", "is_test", "is_active", "team"]
 
     def reason_short(self, instance):
