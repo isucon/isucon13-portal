@@ -253,7 +253,7 @@ ENVCHECK_AMI_ID = "ami-04a7c0e0153437272"
 ENVCHECK_AZ_ID = "apne1-az1"
 ENVCHECK_DEVELOP = True
 
-CONTEST_AMI_ID = "ami-058c0eeb4f389dc6f"
+CONTEST_AMI_ID = "ami-0172f1f63d8f11bba"
 
 
 # チームに所属できる最大人数
