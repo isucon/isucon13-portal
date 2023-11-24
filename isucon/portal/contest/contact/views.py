@@ -35,7 +35,7 @@ def ticket_detail(request, pk):
             comment.save()
             ticket.updated_at = comment.created_at
             if ticket.status == "waiting":
-                ticket.status = "progress"
+                ticket.status = "accepted"
             ticket.save()
             messages.success(request, "チケットにコメントを送信しました")
             return redirect("ticket_detail", pk=ticket.pk)

@@ -12,7 +12,6 @@ class Ticket(models.Model):
     description = models.TextField('本文')
     STATUS = [
         ('accepted', '受付済み'),
-        ('progress', '進行中'),
         ('waiting', '参加者対応待ち'),
         ('closed', 'クローズ済み'),
     ]
