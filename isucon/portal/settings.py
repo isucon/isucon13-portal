@@ -278,7 +278,7 @@ RANKING_TOPN = 30
 SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/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"
 
 # 外部リンク
-MANUAL_URL = '' # TODO:
+MANUAL_URL = "https://gist.github.com/kazeburo/bccc2d2b2b9dc307b5640ae855f3e0bf" # 当日マニュアル
 REGULATION_URL = "https://isucon.net/archives/57768216.html"
 DISCORD_URL = '' # TODO:
 ISUCON_OFFICIAL_URL = 'http://isucon.net/'
