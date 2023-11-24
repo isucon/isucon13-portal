@@ -16,6 +16,7 @@
         <tr>
             <th>TcketID</th>
             <th>Status</th>
+            <th>Genre</th>
             <th>Title</th>
             <th>Created</th>
             <th>Update</th>
@@ -26,6 +27,7 @@
             <tr>
                 <td class="has-text-right">{{ ticket.id }}</td>
                 <td class="">{{ ticket.get_status_display }}</td>
+                <td class="">{{ ticket.get_genre_display }}</td>
                 <td class="">
                     <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
                 </td>

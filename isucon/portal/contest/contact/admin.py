@@ -4,7 +4,8 @@ from django.forms import BaseInlineFormSet
 from django.http import HttpRequest
 from isucon.portal.contest.contact import models
 from django.urls import reverse
-from django.utils.safestring import mark_safe 
+from django.utils.safestring import mark_safe
+from django.contrib.humanize.templatetags import humanize
 
 class TicketInlineFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
@@ -35,8 +36,8 @@ class TicketCommentInline(admin.StackedInline):
     is_staff.short_description = 'staff'
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'status', 'created_at', 'updated_at']
-    list_filter = ['status', 'owner__team']
+    list_display = ['id', 'genre', 'title', 'status', 'created_at', 'updated_at']
+    list_filter = ['status', 'genre', 'owner__team']
     search_fields = ['title', 'body']
     inlines = [TicketCommentInline]
 

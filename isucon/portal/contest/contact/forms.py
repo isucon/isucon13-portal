@@ -13,8 +13,9 @@ class TicketCommentForm(forms.ModelForm):
 class NewTicketForm(forms.ModelForm):
     class Meta:
         model = models.Ticket
-        fields = ["title", "description"]
+        fields = ["genre", "title", "description"]
         widgets = {
+            "genre": forms.Select(attrs={}),
             "title": forms.TextInput(attrs={"class": "input"}),
             "description": forms.Textarea(attrs={"class": "textarea"}),
         }
