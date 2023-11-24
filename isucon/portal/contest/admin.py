@@ -10,7 +10,7 @@ from isucon.portal.contest.models import (
 
 
 class ServerAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "global_ip", "private_ip", "is_checked"]
+    list_display = ["id", "team", "global_ip", "private_ip", "is_checked", "is_bench_target"]
     list_filter = ["team", "is_checked"]
 
 admin.site.register(Server, ServerAdmin)

@@ -11,33 +11,67 @@
     <!-- create ticket button -->
     <a href="{% url 'ticket_new' %}" class="button is-link">New Ticket</a>
 
-    <table class="table is-fullwidth is-striped" style="margin-top: 3em;">
-    <thead>
-        <tr>
-            <th>TcketID</th>
-            <th>Status</th>
-            <th>Title</th>
-            <th>Created</th>
-            <th>Update</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ticket in tickets %}
+    <h2 style="font-size: 1.3em; margin: 1em 0;">Tickets</h2>
+    <table class="table is-fullwidth is-striped">
+        <thead>
             <tr>
-                <td class="has-text-right">{{ ticket.id }}</td>
-                <td class="">{{ ticket.get_status_display }}</td>
-                <td class="">
-                    <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
-                </td>
-                <td class="">{{ ticket.created_at }}</td>
-                <!-- example: 12秒前, 5分以内であれば赤、それ以降は灰色 -->
-                <td class="">
-                    <span class="tag is-small {% if ticket.is_recent %}is-danger{% else %}is-light{% endif %}">{{ ticket.updated_at|naturaltime }}</span>
-                </td>
+                <th>TcketID</th>
+                <th>Status</th>
+                <th>Genre</th>
+                <th>Title</th>
+                <th>Created</th>
+                <th>Update</th>
             </tr>
-        {% endfor %}
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+                <tr>
+                    <td class="has-text-right">{{ ticket.id }}</td>
+                    <td class="">{{ ticket.get_status_display }}</td>
+                    <td class="">{{ ticket.get_genre_display }}</td>
+                    <td class="">
+                        <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
+                    </td>
+                    <td class="">{{ ticket.created_at }}</td>
+                    <!-- example: 12秒前, 5分以内であれば赤、それ以降は灰色 -->
+                    <td class="">
+                        <span class="tag is-small {% if ticket.is_recent %}is-danger{% else %}is-light{% endif %}">{{ ticket.updated_at|naturaltime }}</span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 style="font-size: 1.3em; margin: 1em 0;">Public Tickets</h2>
+    <table class="table is-fullwidth is-striped" style="margin-top: 1em;">
+        <thead>
+            <tr>
+                <th>TcketID</th>
+                <th>Status</th>
+                <th>Genre</th>
+                <th>Title</th>
+                <th>Created</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in public_tickets %}
+                <tr>
+                    <td class="has-text-right">{{ ticket.id }}</td>
+                    <td class="">{{ ticket.get_status_display }}</td>
+                    <td class="">{{ ticket.get_genre_display }}</td>
+                    <td class="">
+                        <a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.title }}</a>
+                    </td>
+                    <td class="">{{ ticket.created_at }}</td>
+                    <!-- example: 12秒前, 5分以内であれば赤、それ以降は灰色 -->
+                    <td class="">
+                        <span class="tag is-small {% if ticket.is_recent %}is-danger{% else %}is-light{% endif %}">{{ ticket.updated_at|naturaltime }}</span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 </div>
 

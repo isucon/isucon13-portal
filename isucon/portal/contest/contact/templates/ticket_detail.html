@@ -35,25 +35,41 @@
                                 <td>{{ ticket.id }}</td>
                             </tr>
                             <tr>
+                                <th width="10%">Genre</th>
+                                <td>{{ ticket.get_genre_display }}</td>
+                            </tr>
+                            <tr>
                                 <th width="10%">Title</th>
                                 <td>{{ ticket.title }}</td>
                             </tr>
                             <tr>
                                 <th width="10%">Owner</th>
-                                <td>{{ ticket.owner }}</td>
+                                <td>{{ ticket.owner }} ({{ ticket.owner.team }})</td>
                             </tr>
                             <tr>
                                 <th width="10%">Status</th>
                                 <td>{{ ticket.get_status_display }}</td>
                             </tr>
                             <tr>
+                                <th width="10%">Visibility</th>
+                                <td>{{ ticket.get_visibility_display }}</td>
+                            </tr>
+                            <tr>
                                 <th width="10%">CreatedAt</th>
                                 <td>{{ ticket.created_at }}</td>
                             </tr>
+                            {% if show_description %}
                             <tr>
                                 <th width="10%">Description</th>
                                 <td>{{ ticket.description | linebreaksbr }}</td>
                             </tr>
+                            {% endif %}
+                            {% if ticket.summary %}
+                            <tr>
+                                <th width="10%">Summary</th>
+                                <td>{{ ticket.summary | linebreaksbr }}</td>
+                            </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -61,8 +77,8 @@
         </div>
     </section>
 
+    {% if comments %}
     <h2 style="font-size: 1.3em; margin-top: 3em;">Comments (Newest)</h2>
-
     <section style="display: flex; flex-direction: column; gap: 30px">
         {% for comment in comments %}
         <div class="card">
@@ -86,8 +102,9 @@
         </div>
         {% endfor %}
     </section>
+    {% endif %}
 
-    {% if not ticket.is_closed %}
+    {% if can_post_comment %}
 
     <h2 style="font-size: 1.3em; margin-top: 3em;">New Comments</h2>
     <form method="post" action="{% url 'ticket_detail' ticket.id %}" style="margin-bottom: 3em;">

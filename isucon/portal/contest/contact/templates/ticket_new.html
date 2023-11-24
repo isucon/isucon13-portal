@@ -8,15 +8,45 @@
 
 <div class="column is-9">
 
-    <h2 style="font-size: 1.3em;">New Ticket</h2>
+    <h2 style="font-size: 1.3em; margin-bottom: 1em;">New Ticket</h2>
     <form method="post" action="{% url 'ticket_new' %}" style="margin-bottom: 3em;">
         {% csrf_token %}
-        <div class="">
-            {{ form.as_p }}
+        {{ form.non_field_errors }}
+        <div class="field">
+            <label class="label" for="{{ form.genre.id_for_label }}">
+                {{ form.genre.label }}
+            </label>
+            <div class="control select">
+                {{ form.genre }}
+            </div>
+            <p class="help">{{ form.genre.help_text }}</p>
+            <p class="help is-danger">{{ form.genre.errors }}</p>
         </div>
-        <div class="is-grouped" style="margin-top: 1em;">
+        <div class="field">
+            <label class="label" for="{{ form.title.id_for_label }}">
+                {{ form.title.label }}
+            </label>
             <div class="control">
-                <button class="button is-link" type="submit">Submit</button>
+                {{ form.title }}
+            </div>
+            <p class="help">{{ form.title.help_text }}</p>
+            <p class="help is-danger">{{ form.title.errors }}</p>
+        </div>
+        <div class="field">
+            <label class="label" for="{{ form.description.id_for_label }}">
+                {{ form.description.label }}
+            </label>
+            <div class="control">
+                {{ form.description }}
+            </div>
+            <p class="help">{{ form.description.help_text }}</p>
+            <p class="help is-danger">{{ form.description.errors }}</p>
+        </div>
+        <div class="field">
+            <div class="is-grouped" style="margin-top: 1em;">
+                <div class="control">
+                    <button class="button is-link" type="submit">Submit</button>
+                </div>
             </div>
         </div>
     </form>
