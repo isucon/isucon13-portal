@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from isucon.portal.authentication.decorators import team_is_authenticated
 from isucon.portal.contest.contact.forms import NewTicketForm, TicketCommentForm
 from isucon.portal.contest.contact.models import Ticket
+from isucon.portal.contest.contact.notify import notify_contact
 from isucon.portal.contest.decorators import team_is_now_on_contest
 from django.contrib import messages
 
@@ -38,6 +39,10 @@ def ticket_detail(request, pk):
                 ticket.status = "accepted"
             ticket.save()
             messages.success(request, "チケットにコメントを送信しました")
+            try:
+                notify_contact(request, ticket, "チケットにコメントが追加されました")
+            except Exception as e:
+                print(e)
             return redirect("ticket_detail", pk=ticket.pk)
 
     comments = []
@@ -78,6 +83,10 @@ def ticket_new(request):
             ticket.owner = request.user
             ticket.save()
             messages.success(request, "チケットを作成しました")
+            try:
+                notify_contact(request, ticket, "チケットが作成されました")
+            except Exception as e:
+                print(e)
             return redirect("ticket_detail", pk=ticket.pk)
         else:
             messages.error(request, "チケットの作成に失敗しました")
