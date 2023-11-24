@@ -17,6 +17,15 @@ class Ticket(models.Model):
         ('closed', 'クローズ済み'),
     ]
     status = models.CharField('ステータス', max_length=10, choices=STATUS, default='accepted')
+    GENRE = [
+        ('code', '競技用コード'),
+        ('infra', '参加者インフラ'),
+        ('regulation', 'レギュレーション'),
+        ('benchmark', 'ベンチマーク'),
+        ('env', '環境チェック'),
+        ('other', 'その他'),
+    ]
+    genre = models.CharField('ジャンル', max_length=10, choices=GENRE, default='other')
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("最終更新日時", auto_now=True)
 
