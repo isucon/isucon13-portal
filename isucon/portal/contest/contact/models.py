@@ -26,6 +26,13 @@ class Ticket(models.Model):
         ('other', 'その他'),
     ]
     genre = models.CharField('ジャンル', max_length=10, choices=GENRE, default='other')
+    VISIBILITY = [
+        ('public', '公開'),
+        ('summary', '要約のみ公開'),
+        ('private', '非公開'),
+    ]
+    visibility = models.CharField('公開範囲', max_length=10, choices=VISIBILITY, default='private')
+    summary = models.TextField('回答要約', blank=True)
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("最終更新日時", auto_now=True)
 
@@ -40,6 +47,14 @@ class Ticket(models.Model):
             return True
         return False
 
+    def only_team_query_set(team):
+        return Ticket.objects.filter(owner__team=team)
+    
+    def public_query_set():
+        return Ticket.objects.filter(models.Q(visibility="public") | models.Q(visibility="summary"))
+
+    def visible_query_set(team):
+        return Ticket.objects.filter(models.Q(owner__team=team) | models.Q(visibility="public") | models.Q(visibility="summary"))
 
 class TicketComment(models.Model):
     class Meta:

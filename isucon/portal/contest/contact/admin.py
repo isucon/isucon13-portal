@@ -36,8 +36,8 @@ class TicketCommentInline(admin.StackedInline):
     is_staff.short_description = 'staff'
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['id', 'genre', 'title', 'status', 'created_at', 'updated_at']
-    list_filter = ['status', 'genre', 'owner__team']
+    list_display = ['id', 'genre', 'title', 'status', 'visibility', 'created_at', 'updated_at']
+    list_filter = ['status', 'genre', 'visibility', 'owner__team']
     search_fields = ['title', 'body']
     inlines = [TicketCommentInline]
 
