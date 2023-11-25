@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'isucon.portal.authentication',
     'isucon.portal.envcheck',
     'isucon.portal.contest',
-    # 'isucon.portal.contest.staff',
+    'isucon.portal.contest.staff',
     'isucon.portal.contest.result',
     'isucon.portal.contest.contact',
 ]

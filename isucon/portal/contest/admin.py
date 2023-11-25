@@ -42,7 +42,7 @@ admin.site.register(Score, ScoreAdmin)
 
 class JobAdmin(admin.ModelAdmin):
     list_display = [
-        "id", "team", "status", "target", "is_active", "is_test", "is_passed",
+        "id", "team", "status", "created_at", "updated_at", "is_active", "is_test", "is_passed",
         "score", "resolved_count", "language", "reason_short"
     ]
     list_filter = ["status", "is_passed", "is_test", "is_active", "language", "team"]

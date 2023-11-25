@@ -21,7 +21,7 @@ class Command(BaseCommand):
         response = sqs_client.receive_message(
             QueueUrl=settings.SQS_JOB_RESULT_URL,
             AttributeNames=["SentTimestamp"],
-            MaxNumberOfMessages=10,
+            MaxNumberOfMessages=1,
             VisibilityTimeout=0,
             WaitTimeSeconds=wait_time_seconds,
         )
@@ -41,11 +41,13 @@ class Command(BaseCommand):
                             instance = Job.objects.get(pk=body["id"])
                         except Job.DoesNotExist:
                             continue
-                        serializer = JobResultSerializer(instance=instance, data=body, partial=True)
-                        if serializer.is_valid(raise_exception=False):
-                            serializer.save()
-                        else:
-                            print(serializer.errors)
+
+                        if instance.status in (Job.WAITING, Job.RUNNING):
+                            serializer = JobResultSerializer(instance=instance, data=body, partial=True)
+                            if serializer.is_valid(raise_exception=False):
+                                serializer.save()
+                            else:
+                                print(serializer.errors)
 
                 # 正常に終了したらキューから消す
                 receipt_handle = message["ReceiptHandle"]

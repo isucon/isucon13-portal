@@ -14,7 +14,7 @@ urlpatterns = [
     path('servers/<int:pk>/', views.delete_server, name="delete_server"),
     path('graph/', views.graph, name="graph"),
     # path('teams/', views.teams, name="teams"),
-    # path('staff/', include("isucon.portal.contest.staff.urls")),
+    path('staff/', include("isucon.portal.contest.staff.urls")),
     path('result/', include("isucon.portal.contest.result.urls")),
     path('contact/', include("isucon.portal.contest.contact.urls")),
 ]

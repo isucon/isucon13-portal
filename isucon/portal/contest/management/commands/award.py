@@ -60,7 +60,7 @@ class Command(BaseCommand):
         最終ベンチマークスコアがGo言語の初回のベンチマークスコアの10倍に一番近いチーム
         """
 
-        target_score = 1000 * 10
+        target_score = 3673 * 10
 
         print("10X (最終スコアが{}に一番近いチーム)".format(target_score))
 
@@ -264,11 +264,18 @@ class Command(BaseCommand):
 
         print("さくらインターネット (成功したベンチマークのうち、最もDNSの名前解決成功数が多かったチーム)")
 
-        for job in Job.objects.filter(is_test=False, is_passed=True, is_active=True).order_by("-resolved_count"):
-            if Score.objects.active().filter(team=job.team).exists():
-                score = Score.objects.get(team=job.team)
-                self.print_score(score, "{}回".format(job.resolved_count))
-                return
 
-        print("該当なし")
+        target_score = None
+        target_count = 0
 
+        for score in Score.objects.active().order_by("-latest_score")[:30]:
+            job = Job.objects.get_latest_score(score.team)
+            if job.resolved_count > target_count:
+                target_score = score
+                target_count = job.resolved_count
+
+        if not target_score:
+            print("該当なし")
+            return
+
+        self.print_score(target_score, "{}回".format(target_count))

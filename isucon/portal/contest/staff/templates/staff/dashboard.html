@@ -1,13 +1,87 @@
-{% extends "dashboard.html" %}
+{% extends "include/layout.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="column is-9">
+    {% block breadcrumb %}
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="/">ISUCON13</a></li>
+            <li><a href="{% url "staff_dashboard" %}">Staff</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Dashboard</a></li>
+        </ul>
+    </nav>
+    {% endblock %}
+
+    <section class="graph">
+        <canvas id="myChart" width="400" height="300" data-my-team="{{ user.team.id }}"></canvas>
+        <p>※ 点をクリックすると、グラフデータが強調表示されます</p>
+    </section>
+
+    <section class="table-list">
+        <div class="card events-card">
+            <header class="card-header is-danger">
+                <p class="card-header-title">
+                    <span class="icon">
+                        <i class="fas fa-chart-area"></i>
+                    </span>
+                    <span>Top Teams</span>
+                </p>
+            </header>
+
+            <div class="card-table">
+                <div class="content">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Latest Score</th>
+                                <th>Best Score</th>
+                                <th>FinishTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for score in top_teams %}
+                            <tr {% if team.id == user.team.id %}class="is-selected"{% endif %}>
+                                <td class="has-text-right">{{ forloop.counter }}</td>
+                                <td class="has-text-right">{{ score.team.id }}</td>
+                                <td>{{ score.team }}</td>
+                                <td class="has-text-right">{{ score.latest_score|intcomma }}</td>
+                                <td class="has-text-right">{{ score.best_score|intcomma }}</td>
+                                <td>{{ score.latest_scored_at|date:"H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <footer class="card-footer">
+                  <a href="{% url "staff_scores" %}" class="card-footer-item">View All</a>
+            </footer>
+        </div>
+    </section>
 
 
+</div>
+<!-- dummy -->
+<form method="post"></form>
 
-{% block breadcrumb %}
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><a href="/">ISUCON13</a></li>
-        <li><a href="{% url "staff_dashboard" %}">Staff</a></li>
-        <li class="is-active"><a href="#" aria-current="page">Dashboard</a></li>
-    </ul>
-</nav>
-{% endblock %}
+
+{% endblock content %}
+
+{% block script %}
+<script>
+
+setTimeout(function(){
+    document.location.reload();
+}, 30000);
+
+window.addEventListener('load', () => {
+    renderingGraph(document.getElementById('myChart'), '{{ request.path }}graph/');
+});
+
+</script>
+{% endblock script %}
