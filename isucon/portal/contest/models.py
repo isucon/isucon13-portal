@@ -35,7 +35,10 @@ class ServerManager(models.Manager):
 
     def get_bench_target(self, team):
         """チームのベンチマーク対象を取得"""
-        return self.get_queryset().get(team=team, is_bench_target=True)
+        try:
+            return self.get_queryset().filter(team=team, is_bench_target=True)[0]
+        except IndexError:
+            raise Server.DoesNotExist
 
     # FIXME: WAITING状態でenqueueされていても、変更ができる.
     # このことのテストを追加
