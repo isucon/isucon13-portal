@@ -4,7 +4,7 @@ import pprint
 from django.core.management.base import BaseCommand
 
 from isucon.portal.authentication.models import Team
-from isucon.portal.contest.models import Job, Server
+from isucon.portal.contest.models import Job, Server, Score
 from isucon.portal.contest.exceptions import DuplicateJobError
 
 
@@ -21,6 +21,10 @@ class Command(BaseCommand):
             queryset = queryset.filter(id=options["team"])
 
         for team in queryset:
+
+            if Score.objects.filter(team=team, test_is_passed=True).exists():
+                continue
+
             try:
                 job = Job.objects.enqueue(team=team, is_test=True)
                 print(team, job)

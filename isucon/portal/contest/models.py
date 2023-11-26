@@ -277,7 +277,8 @@ class Score(LogicalDeleteMixin, models.Model):
             self.latest_score = latest_job.score
             self.latest_scored_at = latest_job.finished_at
             self.latest_is_passed = latest_job.is_passed
-            self.language = latest_job.language
+            if latest_job.language and latest_job.language != "unknown":
+                self.language = latest_job.language
         except IndexError:
             self.latest_score = 0
             self.latest_scored_at = None

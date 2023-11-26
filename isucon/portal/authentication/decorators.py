@@ -1,4 +1,5 @@
 import functools
+import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.http import HttpResponse
 
+from isucon.portal import utils as portal_utils
 from isucon.portal.authentication.models import Team
 
 
@@ -16,7 +18,11 @@ def team_is_authenticated(function):
         if user.team is None:
             return redirect("index")
         if user.team.banned_at:
-            return HttpResponse("必要な対応が指定日時までに完了していなかったため参加がキャンセルされました", status=403)
+            start_time = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_START_TIME).replace(tzinfo=portal_utils.jst)
+            if user.team.banned_at < start_time:
+                return HttpResponse("必要な対応が指定日時までに完了していなかったため参加がキャンセルされました", status=403)
+            return HttpResponse("レギュレーション違反などの理由により失格としました、詳しくはDiscordのDMなどをご確認ください", status=403)
+
         if not user.team.is_active:
             return HttpResponse("このチームは無効です", status=403)
         return function(request, *args, **kwargs)

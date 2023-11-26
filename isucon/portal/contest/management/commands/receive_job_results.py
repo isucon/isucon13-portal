@@ -6,6 +6,7 @@ import json
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from isucon.portal.contest.models import Job
 from isucon.portal.internal.serializers import JobResultSerializer
@@ -34,7 +35,7 @@ class Command(BaseCommand):
                 body = json.loads(message["Body"])
 
                 if body:
-                    print("Receive ID:", body["id"])
+                    print("Receive ID:", body["id"], "Status:", body["status"], str(timezone.now()))
                     with transaction.atomic():
                         # DBを更新する
                         try:
@@ -45,7 +46,8 @@ class Command(BaseCommand):
                         if instance.status in (Job.WAITING, Job.RUNNING):
                             serializer = JobResultSerializer(instance=instance, data=body, partial=True)
                             if serializer.is_valid(raise_exception=False):
-                                serializer.save()
+                                instance = serializer.save()
+                                print("Saved ID:", instance.id)
                             else:
                                 print(serializer.errors)
 

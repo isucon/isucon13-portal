@@ -171,6 +171,9 @@ class Command(BaseCommand):
         target_team = None
         target_team_rate = 0
 
+        x_1 = 0
+        x_2 = 0
+
         for s in Score.objects.active():
             team = s.team
             best_job = None
@@ -188,6 +191,8 @@ class Command(BaseCommand):
                 if target_team_rate < rate:
                     target_team = team
                     target_team_rate = rate
+                    x_1 = job.score
+                    x_2 = best_job.score
                     
                 if best_job.score < job.score:
                     best_job = job

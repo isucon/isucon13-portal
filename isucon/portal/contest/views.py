@@ -249,11 +249,10 @@ def get_graph_data():
 
 
 def graph(request):
-    # NOTE: CONTEST_START_TIME-10minutes ~ CONTEST_END_TIME+10minutes にするようにmin, maxを渡す
-    graph_start_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_START_TIME) - datetime.timedelta(minutes=10)
+    graph_start_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_START_TIME)
     graph_start_at = graph_start_at.replace(tzinfo=portal_utils.jst)
 
-    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME) + datetime.timedelta(minutes=10)
+    graph_end_at = datetime.datetime.combine(settings.CONTEST_DATE, settings.CONTEST_END_TIME)
     graph_end_at = graph_end_at.replace(tzinfo=portal_utils.jst)
 
     graph_datasets = get_graph_data()
@@ -286,7 +285,7 @@ def graph(request):
         'graph_datasets': graph_datasets,
         "graph_min": portal_utils.normalize_for_graph_label(graph_start_at),
         "graph_max": portal_utils.normalize_for_graph_label(graph_end_at),
-        "ranking": ranking if (timezone.now() < graph_end_at or settings.SHOW_RESULT_AFTER < timezone.now()) else None,
+        "ranking": ranking if (timezone.now() < graph_end_at-datetime.timedelta(hours=1) or settings.SHOW_RESULT_AFTER < timezone.now()) else None,
     }
 
     return JsonResponse(
