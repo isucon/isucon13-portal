@@ -37,9 +37,9 @@ DISCORD_USER_LOCAL_PARTICIPATION_ROLE_ID = os.environ.get("DISCORD_USER_LOCAL_PA
 
 # AWS
 SQS_JOB_URLS = {
-    "apne1-az1": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/prod-job-queue-apne1-az1.fifo",
-    "apne1-az2": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/prod-job-queue-apne1-az2.fifo",
-    "apne1-az4": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/prod-job-queue-apne1-az4.fifo",
+    "apne1-az1": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/prod-job-queue-apne1-az1.fifo",
+    "apne1-az2": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/prod-job-queue-apne1-az2.fifo",
+    "apne1-az4": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/prod-job-queue-apne1-az4.fifo",
 }
 
-SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/424484851194/prod-job-result"
+SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/prod-job-result"

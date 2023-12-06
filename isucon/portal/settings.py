@@ -203,17 +203,17 @@ LOGGING = {
 
 # AWS
 DEFAULT_FILE_STORAGE = "isucon.storage_backends.MediaStorage"
-AWS_ACCESS_KEY_ID = "AKIAWFVKEZX5PTZOKL36"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_STORAGE_BUCKET_NAME = "isucon13-portal-dev"
+AWS_ACCESS_KEY_ID = "xxxxxxxxxxxx"
+AWS_SECRET_ACCESS_KEY = "xxxxxxxxxxxx"
+AWS_STORAGE_BUCKET_NAME = "xxxxxxxxxxxx"
 
 SQS_JOB_URLS = {
-    "apne1-az1": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az1.fifo",
-    "apne1-az2": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az2.fifo",
-    "apne1-az4": "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-queue-apne1-az4.fifo",
+    "apne1-az1": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/develop-job-queue-apne1-az1.fifo",
+    "apne1-az2": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/develop-job-queue-apne1-az2.fifo",
+    "apne1-az4": "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/develop-job-queue-apne1-az4.fifo",
 }
 
-SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/424484851194/develop-job-result"
+SQS_JOB_RESULT_URL = "https://sqs.ap-northeast-1.amazonaws.com/xxxxxxxxxxxx/develop-job-result"
 
 
 # 登録期間
@@ -234,18 +234,18 @@ SHOW_RESULT_AFTER = portal_utils.get_jst_datetime(2023, 11, 26, 18, 0, 0)
 
 # Github認証に使うトーク
 # TODO: 入れ替える
-SOCIAL_AUTH_GITHUB_KEY = '6297ed790692a808fda1'
-SOCIAL_AUTH_GITHUB_SECRET = '2a50f16453b05aaa2b024d882ca5030de9858abc'
+SOCIAL_AUTH_GITHUB_KEY = 'xxxxxxxxxxxx'
+SOCIAL_AUTH_GITHUB_SECRET = 'xxxxxxxxxxxx'
 
 # Discord
-DISCORD_APPLICATION_ID = '1151357797670338641'
-DISCORD_SECRET = 'fbd9f57d6ff49ffb1b3ac5cce47e90d8cc95e5fc25f1d601241552305d2e89b5'
-DISCORD_OAUTH_CLIENT_ID = '1151357797670338641'
-DISCORD_OAUTH_CLIENT_SECRET = 'yPr9Gy0m61o3oAbtI3mKmyy8cgFxz0Ix'
+DISCORD_APPLICATION_ID = 'xxxxxxxxxxxx'
+DISCORD_SECRET = 'xxxxxxxxxxxx'
+DISCORD_OAUTH_CLIENT_ID = 'xxxxxxxxxxxx'
+DISCORD_OAUTH_CLIENT_SECRET = 'xxxxxxxxxxxx'
 
-DISCORD_SERVER_ID = "1155732629547659354"
-DISCORD_BOT_ACCESS_TOKEN = "MTE1MTM1Nzc5NzY3MDMzODY0MQ.Gzgj4M.1WndtrZJl7QdoMG_wQfSbkV9hU5AoX3pzN8WrE"
-DISCORD_USER_ROLE_ID = "1155732748821073930"
+DISCORD_SERVER_ID = "xxxxxxxxxxxx"
+DISCORD_BOT_ACCESS_TOKEN = "xxxxxxxxxxxx"
+DISCORD_USER_ROLE_ID = "xxxxxxxxxxxx"
 
 BENCHMARK_ABORT_TIMEOUT_SEC = 300
 
@@ -276,7 +276,7 @@ REDIS_HOST = '127.0.0.1'
 RANKING_TOPN = 30
 
 # Slack
-SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/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"
+SLACK_ENDPOINT_URL = "https://hooks.slack.com/services/xxxxxxxxxxxx/xxxxxxxxxxxx/xxxxxxxxxxxx"
 
 # 外部リンク
 MANUAL_URL = "https://gist.github.com/kazeburo/bccc2d2b2b9dc307b5640ae855f3e0bf" # 当日マニュアル
