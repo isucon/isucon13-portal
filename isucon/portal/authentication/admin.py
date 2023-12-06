@@ -8,6 +8,9 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
+from import_export import resources
+from import_export.admin import ExportMixin
+
 from isucon.portal.authentication.models import User, Team, RegisterCoupon
 
 
@@ -91,11 +94,17 @@ class TeamMemberInline(admin.TabularInline):
     readonly_fields = ["id", "username", "display_name", "is_student"]
     extra = 0
 
-class TeamAdmin(admin.ModelAdmin):
+
+class TeamResource(resources.ModelResource):
+    class Meta:
+        model = Team
+
+class TeamAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ["id", "name", "owner", "is_guest", "is_active", "envcheck_was_done", "aws_az", "created_at", "declined_at"]
     list_filter = ["is_active", "is_guest", "want_local_participation", "is_local_participation", EnvCheckListFilter, "aws_az"]
     search_fields = ["name"]
     inlines = [TeamMemberInline]
+    resource_class = TeamResource
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
         return Team.original_manager.all()

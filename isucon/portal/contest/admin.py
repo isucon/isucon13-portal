@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django import forms
 
+from import_export import resources
+from import_export.admin import ExportMixin
+
 from isucon.portal.contest.models import (
     Server,
     Information,
@@ -30,12 +33,18 @@ class InformationAdmin(admin.ModelAdmin):
 admin.site.register(Information, InformationAdmin)
 
 
-class ScoreAdmin(admin.ModelAdmin):
+class ScoreResource(resources.ModelResource):
+    class Meta:
+        model = Score
+
+
+class ScoreAdmin(ExportMixin, admin.ModelAdmin):
     list_display = [
         "id", "team", "best_score", "latest_score", "latest_is_passed",
         "test_score", "test_is_passed", "language",
     ]
     list_filter = ["latest_is_passed", "test_is_passed", "language"]
+    resource_class = ScoreResource
 
 admin.site.register(Score, ScoreAdmin)
 
